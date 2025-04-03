@@ -1,10 +1,16 @@
 # TODO: Change env vars to files
 
+# Repository versions
+SALEOR_VERSION = 3.20.80
+SALEOR_DASHBOARD_VERSION = 3.20.34
+SALEOR_PLATFORM_VERSION = latest
+STOREFRONT_VERSION = latest
+
 REPOS = \
-    https://github.com/saleor/saleor.git \
-    https://github.com/saleor/saleor-dashboard.git \
-    https://github.com/saleor/saleor-platform.git \
-	https://github.com/saleor/storefront.git
+    https://github.com/saleor/saleor.git@$(SALEOR_VERSION) \
+    https://github.com/saleor/saleor-dashboard.git@$(SALEOR_DASHBOARD_VERSION) \
+    https://github.com/saleor/saleor-platform.git@$(SALEOR_PLATFORM_VERSION) \
+    https://github.com/saleor/storefront.git@$(STOREFRONT_VERSION)
 
 .PHONY: cluster apply_all delete_all
 
@@ -15,7 +21,19 @@ cluster:
 clone_all:
 	mkdir -p repos
 	@for repo in $(REPOS); do \
-		git clone $$repo repos/; \
+		repo_url=$$(echo $$repo | cut -d '@' -f 1); \
+		version=$$(echo $$repo | cut -d '@' -f 2); \
+		dir=$$(basename $$repo_url .git); \
+		echo "Cloning $$dir..."; \
+		git clone $$repo_url repos/$$dir; \
+		cd repos/$$dir; \
+		if [ "$$version" != "latest" ]; then \
+			echo "Checking out version $$version for $$dir..."; \
+			git checkout tags/$$version || git checkout $$version; \
+		fi; \
+		echo "Removing .git directory from $$dir..."; \
+		rm -rf .git; \
+		cd ../../; \
 	done
 
 pull_all:
@@ -34,10 +52,10 @@ apply_local:
 	KUBECONFIG= kustomize build kube/overlays/local | KUBECONFIG= kubectl apply -n higiliquidos -f -
 
 apply_prod:
-	KUBECONFIG=1 kubectl apply -f kube/namespace.yml && KUBECONFIG=1 kustomize build kube/overlays/prod | KUBECONFIG=1 kubectl apply -n higiliquidos -f -
+	KUBECONFIG=/vagrant/kubeconfig kustomize build kube/overlays/prod | KUBECONFIG=/vagrant/kubeconfig kubectl apply -n higiliquidos -f -
 
 delete_local:
 	KUBECONFIG= kustomize build kube/overlays/local | KUBECONFIG= kubectl delete -n higiliquidos -f -
 
 delete_prod:
-	KUBECONFIG=1 kustomize build kube/overlays/prod | KUBECONFIG=1 kubectl delete -n higiliquidos -f -
+	KUBECONFIG=/vagrant/kubeconfig kustomize build kube/overlays/prod | KUBECONFIG=/vagrant/kubeconfig kubectl delete -n higiliquidos -f -
