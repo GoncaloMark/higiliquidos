@@ -1,0 +1,54 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+patches:
+  # Redis StatefulSet patches
+  - target:
+      kind: StatefulSet
+      name: redis
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: registry.deti/higiliquidos/redis:7.0.11-alpine
+      - op: replace
+        path: /spec/template/spec/initContainers/0/image
+        value: registry.deti/higiliquidos/redis:7.0.11-alpine
+      - op: replace
+        path: /spec/template/spec/initContainers/1/image
+        value: registry.deti/higiliquidos/redis:7.0.11-alpine
+
+  # Sentinel Deployment patches  
+  - target:
+      kind: Deployment
+      name: redis-sentinel
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: registry.deti/higiliquidos/redis:7.0.11-alpine
+      - op: replace
+        path: /spec/template/spec/initContainers/0/image
+        value: registry.deti/higiliquidos/redis:7.0.11-alpine
+
+  # PostgreSQL StatefulSet patches
+  - target:
+      kind: StatefulSet
+      name: postgres
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: registry.deti/higiliquidos/postgres:17-alpine
+
+  # Replica StatefulSet patches
+  - target:
+      kind: StatefulSet
+      name: postgres-replica
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: registry.deti/higiliquidos/postgres:17-alpine
+      - op: replace
+        path: /spec/template/spec/initContainers/0/image
+        value: registry.deti/higiliquidos/postgres:17-alpine

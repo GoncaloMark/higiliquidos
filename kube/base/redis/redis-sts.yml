@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+spec:
+  serviceName: redis-service
+  replicas: 3
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      volumes:
+      - name: config
+        configMap:
+          name: redis-config
+      - name: config-volume
+        emptyDir: {}
+      - name: redis-auth
+        secret:
+          secretName: cluster-secrets
+          items:
+          - key: REDIS_PASS
+            path: REDIS_PASS
+      initContainers:
+      - name: config
+        image: redis:7.0.11-alpine
+        command: ['sh', '-c', 'export REDIS_PASS=$(cat /etc/redis-auth/REDIS_PASS) && sed "s/\${REDIS_PASS}/$REDIS_PASS/g" /tmp/redis/redis.conf > /etc/redis/redis.conf']
+        volumeMounts:
+        - name: config
+          mountPath: /tmp/redis
+        - name: config-volume
+          mountPath: /etc/redis
+        - name: redis-auth
+          mountPath: /etc/redis-auth
+          readOnly: true
+
+      - name: redis-init
+        image: redis:7.0.11-alpine
+        command: 
+        - /bin/sh
+        - -c
+        - |
+          REDIS_PASS=$(cat /etc/redis-auth/REDIS_PASS)
+          # Only first pod (redis-0) should be a master
+          if [ $(hostname | sed 's/.*-//') = "0" ]; then
+            echo "I am the master"
+          else
+            echo "I am a replica"
+            # Point to the master
+            echo replicaof redis-0.redis-service 6379 >> /etc/redis/redis.conf
+          fi
+        volumeMounts:
+        - name: redis-auth
+          mountPath: /etc/redis-auth
+          readOnly: true
+        - name: config-volume
+          mountPath: /etc/redis
+      containers:
+      - name: redis
+        image: redis:7.0.11-alpine
+        command: ['redis-server', '/etc/redis/redis.conf']
+        ports:
+        - containerPort: 6379
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: config-volume
+          mountPath: /etc/redis
+        - name: redis-auth
+          mountPath: /etc/redis-auth
+          readOnly: true
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: ['ReadWriteOnce']
+      resources:
+        requests:
+          storage: 1Gi

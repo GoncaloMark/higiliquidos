@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-sentinel
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: redis-sentinel
+  template:
+    metadata:
+      labels:
+        app: redis-sentinel
+    spec:
+      initContainers:
+      - name: config
+        image: redis:7.0.11-alpine
+        command: ['sh', '-c', 'export REDIS_PASS=$(cat /etc/redis-auth/REDIS_PASS) && sed "s/\${REDIS_PASS}/$REDIS_PASS/g" /tmp/sentinel/sentinel.conf > /etc/redis/sentinel.conf']
+        volumeMounts:
+        - name: config
+          mountPath: /tmp/sentinel
+        - name: config-volume
+          mountPath: /etc/redis
+        - name: redis-auth
+          mountPath: /etc/redis-auth
+          readOnly: true
+      containers:
+      - name: sentinel
+        image: redis:7.0.11-alpine
+        command: ['redis-sentinel', '/etc/redis/sentinel.conf']
+        ports:
+        - containerPort: 26379
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/redis
+        - name: redis-auth
+          mountPath: /etc/redis-auth
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: redis-sentinel-config
+      - name: config-volume
+        emptyDir: {}
+      - name: redis-auth
+        secret:
+          secretName: cluster-secrets
+          items:
+          - key: REDIS_PASS
+            path: REDIS_PASS

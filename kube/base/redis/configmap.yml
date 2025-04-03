@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+data:
+  redis.conf: |
+    appendonly yes
+    protected-mode no
+    bind 0.0.0.0
+    port 6379
+    dir /data
+    maxmemory 250mb
+    maxmemory-policy allkeys-lru
+    requirepass ${REDIS_PASS}
+    masterauth ${REDIS_PASS}
+
+--- 
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-sentinel-config
+data:
+  sentinel.conf: |
+    sentinel monitor mymaster redis-0.redis-service 6379 2
+    sentinel down-after-milliseconds mymaster 5000
+    sentinel failover-timeout mymaster 60000
+    sentinel parallel-syncs mymaster 1
+    sentinel auth-pass mymaster ${REDIS_PASS}
+    # Allow resolving hostnames
+    sentinel resolve-hostnames yes
+    sentinel announce-hostnames yes
