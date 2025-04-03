@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minio
+  labels:
+    app: minio
+spec:
+  serviceName: "minio-svc"
+  replicas: 4                  
+  podManagementPolicy: "Parallel"
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+      - name: minio
+        image: minio/minio
+        volumeMounts:
+        - name: minio-data
+          mountPath: /data1
+        args:
+        - server
+        - http://minio-{0...3}.minio-svc/data1
+        env:
+        # MinIO access key and secret key
+        - name: MINIO_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              key: MINIO_A_KEY
+              name: cluster-secrets
+        - name: MINIO_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              key: MINIO_S_KEY
+              name: cluster-secrets
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /minio/health/live
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 120
+          periodSeconds: 15
+          successThreshold: 1
+          timeoutSeconds: 10
+        ports:
+        - containerPort: 9000
+          name: http
+          protocol: TCP
+  volumeClaimTemplates: 
+  - metadata:
+      name: minio-data
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi  
