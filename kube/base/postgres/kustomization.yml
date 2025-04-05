@@ -14,3 +14,6 @@ resources:
 - master-sts.yml
 - replica-sts.yml
 - pg-svc.yml
+- pool-configmap.yml
+- pool-dep.yml
+- pool-svc.yml
