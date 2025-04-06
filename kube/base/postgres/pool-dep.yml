@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: pgpool
-        image: pgpool/pgpool
+        image: pgpool/pgpool:4.4.3
         env:
         - name: POSTGRES_USERNAME
           value: postgres
