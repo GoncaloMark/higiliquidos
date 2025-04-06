@@ -14,8 +14,8 @@ spec:
 
 ---
 
-kind: Service
 apiVersion: v1
+kind: Service
 metadata:
   name: minio-svc
   labels:
@@ -28,3 +28,4 @@ spec:
   ports:
     - name: http
       port: 9000
+      targetPort: 9000
