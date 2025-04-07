@@ -51,11 +51,18 @@ apply_local:
 	KUBECONFIG= kubectl apply -f kube/namespace.yml && \
 	KUBECONFIG= kustomize build kube/overlays/local | KUBECONFIG= kubectl apply -n higiliquidos -f -
 
+apply_local_windows:
+	kubectl apply -f kube/namespace.yml && \
+	kustomize build kube/overlays/local | kubectl apply -n higiliquidos -f -
+
 apply_prod:
 	KUBECONFIG=/vagrant/kubeconfig kustomize build kube/overlays/prod | KUBECONFIG=/vagrant/kubeconfig kubectl apply -n higiliquidos -f -
 
 delete_local:
 	KUBECONFIG= kustomize build kube/overlays/local | KUBECONFIG= kubectl delete -n higiliquidos -f -
+
+delete_local_windows:
+	kustomize build kube/overlays/local | kubectl delete -n higiliquidos -f -
 
 delete_prod:
 	KUBECONFIG=/vagrant/kubeconfig kustomize build kube/overlays/prod | KUBECONFIG=/vagrant/kubeconfig kubectl delete -n higiliquidos -f -

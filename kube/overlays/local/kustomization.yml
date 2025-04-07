@@ -6,6 +6,10 @@ secretGenerator:
   type: Opaque
   envs:
   - .env
+- name: saleor-secrets
+  type: Opaque
+  envs:
+  - .env.saleor
 
 resources:
   - ../../base

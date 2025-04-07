@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: saleor-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: saleor-worker
+  template:
+    metadata:
+      labels:
+        app: saleor-worker
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: saleor-worker
+        image: k3d-higiliqs.local:12345/saleor:3.20.80
+        imagePullPolicy: Always
+        command:
+          - celery
+        args:
+          - -A
+          - saleor
+          - --app=saleor.celeryconf:app
+          - worker
+          - --loglevel=info
+          - -B
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        envFrom:
+          - configMapRef:
+              name: saleor-config
+          - secretRef:
+              name: saleor-secrets
