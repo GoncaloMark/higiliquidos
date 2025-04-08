@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: saleor-setup
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 100
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: saleor-setup
+        image: k3d-higiliqs.local:12345/saleor:3.20.80
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            python3 manage.py migrate &&
+            python3 manage.py populatedb &&
+            python3 manage.py createsuperuser --noinput
+        envFrom:
+          - configMapRef:
+              name: saleor-config
+          - secretRef:
+              name: cluster-secrets

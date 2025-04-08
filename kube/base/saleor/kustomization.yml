@@ -10,3 +10,4 @@ resources:
 - saleor-dep.yml
 - saleor-worker.yml
 - saleor-svc.yml
+- saleor-job.yml
