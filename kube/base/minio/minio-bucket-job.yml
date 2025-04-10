@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-minio-buckets
+spec:
+  template:
+    spec:
+      containers:
+      - name: create-bucket
+        image: minio/mc
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            set -e
+            until mc alias set myminio http://minio-svc:9000 "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY"; do
+              echo "Waiting for MinIO to be ready..."
+              sleep 2
+            done
+            mc mb myminio/$AWS_MEDIA_BUCKET_NAME || echo "media-bucket already exists"
+            mc mb myminio/$AWS_MEDIA_PRIVATE_BUCKET_NAME || echo "private-bucket already exists"
+            mc mb myminio/$AWS_STORAGE_BUCKET_NAME || echo "storage-bucket already exists"
+        envFrom:
+          - secretRef:
+              name: saleor-secrets
+      restartPolicy: OnFailure

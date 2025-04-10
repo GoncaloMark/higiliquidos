@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
 - minio-sts.yml
 - minio-svc.yml
+- minio-bucket-job.yml

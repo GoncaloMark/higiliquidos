@@ -107,24 +107,18 @@ INTERNAL_IPS = get_list(os.environ.get("INTERNAL_IPS", "127.0.0.1"))
 # are not supported.
 DB_CONN_MAX_AGE = int(os.environ.get("DB_CONN_MAX_AGE", 0))
 
+PRIMARY_DB_URL = os.environ.get("PRIMARY_DB", None) 
+REPLICA_DB_URL = os.environ.get("REPLICA_DB", None) 
+
 DATABASE_CONNECTION_DEFAULT_NAME = "default"
-# TODO: For local envs will be activated in separate PR.
-# We need to update docs an saleor platform.
-# This variable should be set to `replica`
 DATABASE_CONNECTION_REPLICA_NAME = "replica"
 
 DATABASES = {
     DATABASE_CONNECTION_DEFAULT_NAME: dj_database_url.config(
-        default="postgres://saleor:saleor@localhost:5432/saleor",
-        conn_max_age=DB_CONN_MAX_AGE,
+        default=PRIMARY_DB_URL, conn_max_age=600
     ),
     DATABASE_CONNECTION_REPLICA_NAME: dj_database_url.config(
-        default="postgres://saleor:saleor@localhost:5432/saleor",
-        # TODO: We need to add read only user to saleor platform,
-        # and we need to update docs.
-        # default="postgres://saleor_read_only:saleor@localhost:5432/saleor",
-        conn_max_age=DB_CONN_MAX_AGE,
-        test_options={"MIRROR": DATABASE_CONNECTION_DEFAULT_NAME},
+        default=REPLICA_DB_URL, conn_max_age=600,
     ),
 }
 
@@ -577,6 +571,7 @@ CELERY_BROKER_URL = (
     os.environ.get("CELERY_BROKER_URL", os.environ.get("CLOUDAMQP_URL")) or ""
 )
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", None)
+CELERY_BROKER_TRANSPORT_OPTIONS = {"master_name": os.environ.get("REDIS_MASTER", "mymaster")}
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_ALWAYS_EAGER = not CELERY_BROKER_URL
 CELERY_TASK_SERIALIZER = "json"

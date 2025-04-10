@@ -52,15 +52,6 @@ patches:
       - op: replace
         path: /spec/template/spec/initContainers/0/image
         value: registry.deti/higiliquidos/postgres:17-alpine
-  
-  # PGPool Deployment Patch
-  - target:
-      kind: Deployment
-      name: pgpool
-    patch: |-
-      - op: replace
-        path: /spec/template/spec/containers/0/image
-        value: registry.deti/higiliquidos/pgpool:4.4.3
 
   # Minio StatefulSet Patch
   - target:
@@ -70,3 +61,11 @@ patches:
       - op: replace
         path: /spec/template/spec/containers/0/image
         value: registry.deti/higiliquidos/minio:RELEASE.2025-04-03T14-56-28Z
+
+  - target:
+      kind: Job 
+      name: create-minio-bucket
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: registry.deti/higiliquidos/mc:RELEASE.2025-04-03T17-07-56Z

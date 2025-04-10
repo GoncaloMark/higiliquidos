@@ -34,23 +34,32 @@ spec:
                 secretKeyRef:
                   key: PG_REPLICATION_PASSWORD
                   name: cluster-secrets
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
 
           command:
           - sh
           - -c
           - |
-            if [ -z "$(ls -A /var/lib/postgresql/data/pgdata)" ]; then
-                echo "Running pg_basebackup to catch up replication server...";
-                pg_basebackup -R -h postgres -D /var/lib/postgresql/data/pgdata -P -U replication; 
-                chown -R postgres:postgres $PGDATA;
+            if [ -z "$(ls -A $PGDATA)" ]; then
+              echo "[init] PGDATA is empty, waiting for primary to become ready...";
+              until pg_isready -h postgres -p 5432 -U replication -d postgres; do
+                echo "[init] Primary not ready, retrying in 2 seconds..."
+                sleep 2
+              done
+              
+              echo "[init] Primary is ready, running pg_basebackup...";
+              pg_basebackup -R -h postgres -D "$PGDATA" -P -U replication 
+              chown -R postgres:postgres "$PGDATA"
             else
-                echo "Skipping pg_basebackup because directory is not empty"; 
+              echo "[init] PGDATA already initialized, skipping pg_basebackup."
             fi
 
           volumeMounts:
             - mountPath: /var/lib/postgresql/data/pgdata
               name: postgres-replica
               subPath: postgres-db
+
 
       containers:
         - name: postgres-replica

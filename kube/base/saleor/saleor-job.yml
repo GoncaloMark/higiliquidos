@@ -16,9 +16,9 @@ spec:
           - |
             python3 manage.py migrate &&
             python3 manage.py populatedb &&
-            python3 manage.py createsuperuser --noinput
+            python3 manage.py createsuperuser --noinput --email higiliqs@higiliquidos.com
         envFrom:
           - configMapRef:
               name: saleor-config
           - secretRef:
-              name: cluster-secrets
+              name: saleor-secrets
