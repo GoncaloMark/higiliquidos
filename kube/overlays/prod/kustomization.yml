@@ -73,7 +73,7 @@ patches:
   # Saleor
   - target:
       kind: Deployment
-      name: saleor
+      name: saleor-api
     patch: |-
       - op: replace
         path: /spec/template/spec/containers/0/image
