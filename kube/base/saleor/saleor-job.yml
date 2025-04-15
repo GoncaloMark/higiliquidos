@@ -4,10 +4,29 @@ metadata:
   name: saleor-setup
 spec:
   backoffLimit: 3
-  ttlSecondsAfterFinished: 100
+  # ttlSecondsAfterFinished: 100
   template:
     spec:
       restartPolicy: Never
+      initContainers:
+      - name: wait-for-postgres
+        image: postgres:17-alpine
+        command: ['sh', '-c', 
+          'until pg_isready -h postgres -d postgres; do echo waiting for postgres; sleep 2; done;']
+        env:
+          - name: POSTGRES_USER
+            value: postgres
+          - name: PGUSER
+            value: postgres
+        
+          - name: POSTGRES_DB
+            value: postgres
+
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: PG_PASSWORD
+                name: cluster-secrets
       containers:
       - name: saleor-setup
         image: k3d-higiliqs.local:12345/saleor:3.20.80

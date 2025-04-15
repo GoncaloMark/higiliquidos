@@ -13,6 +13,11 @@ spec:
         app: saleor-worker
     spec:
       restartPolicy: Always
+      initContainers:
+      - name: wait-for-saleor-setup
+        image: bitnami/kubectl:latest
+        command: ['sh', '-c', 
+          'until kubectl get job saleor-setup -n higiliquidos -o jsonpath="{.status.conditions[?(@.type==\"Complete\")].status}" | grep -q True; do echo waiting for saleor-setup job; sleep 5; done;']
       containers:
       - name: saleor-worker
         image: k3d-higiliqs.local:12345/saleor:3.20.80
@@ -38,3 +43,26 @@ spec:
               name: saleor-config
           - secretRef:
               name: saleor-secrets
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: job-reader
+rules:
+- apiGroups: ["batch"]
+  resources: ["jobs"]
+  verbs: ["get", "watch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: job-reader-binding
+subjects:
+- kind: ServiceAccount
+  name: default
+roleRef:
+  kind: Role
+  name: job-reader
+  apiGroup: rbac.authorization.k8s.io
