@@ -19,6 +19,7 @@ spec:
             mc mb myminio/$AWS_MEDIA_BUCKET_NAME || echo "media-bucket already exists"
             mc mb myminio/$AWS_MEDIA_PRIVATE_BUCKET_NAME || echo "private-bucket already exists"
             mc mb myminio/$AWS_STORAGE_BUCKET_NAME || echo "storage-bucket already exists"
+            mc anonymous set download myminio/$AWS_MEDIA_BUCKET_NAME || echo "media-bucket set to public"
         envFrom:
           - secretRef:
               name: saleor-secrets
