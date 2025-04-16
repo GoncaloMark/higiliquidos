@@ -26,7 +26,7 @@ spec:
       
       initContainers:
         - name: setup-replica-data-directory
-          image: postgres:17-alpine
+          image: k3d-higiliqs.local:12345/postgres:17-alpine
           
           env:
             - name: PGPASSWORD
@@ -63,7 +63,7 @@ spec:
 
       containers:
         - name: postgres-replica
-          image: postgres:17-alpine
+          image: k3d-higiliqs.local:12345/postgres:17-alpine
           args: ['-c', 'config_file=/etc/postgres.conf']
           
           imagePullPolicy: IfNotPresent

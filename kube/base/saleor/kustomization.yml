@@ -11,3 +11,4 @@ resources:
 - saleor-worker.yml
 - saleor-svc.yml
 - saleor-job.yml
+- saleor-ingress.yml

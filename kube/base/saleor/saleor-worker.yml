@@ -15,7 +15,7 @@ spec:
       restartPolicy: Always
       initContainers:
       - name: wait-for-saleor-setup
-        image: bitnami/kubectl:latest
+        image: k3d-higiliqs.local:12345/kubectl:1.32.3  
         command: ['sh', '-c', 
           'until kubectl get job saleor-setup -n higiliquidos -o jsonpath="{.status.conditions[?(@.type==\"Complete\")].status}" | grep -q True; do echo waiting for saleor-setup job; sleep 5; done;']
       containers:

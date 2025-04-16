@@ -20,6 +20,9 @@ spec:
           envFrom:
             - secretRef:
                 name: saleor-dashboard-secrets
+          env: 
+            - name: API_URL
+              value: http://api.higiliquidos.deti.com/graphql/
           resources:
             requests:
               cpu: "10m"
@@ -40,6 +43,4 @@ spec:
             initialDelaySeconds: 30
             timeoutSeconds: 10
           ports:
-            - name: saleor-dsh
-              protocol: TCP
-              containerPort: 80
+              - containerPort: 80

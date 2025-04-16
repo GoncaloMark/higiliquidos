@@ -5,8 +5,6 @@ metadata:
 spec:
   selector:
     app:  saleor-dashboard
-  type: NodePort
   ports:
-  - name: saleor-dsh
-    port: 9000
-    targetPort: saleor-dsh
+    - port: 80
+      targetPort: 80

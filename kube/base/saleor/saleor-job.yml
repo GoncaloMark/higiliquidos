@@ -4,13 +4,12 @@ metadata:
   name: saleor-setup
 spec:
   backoffLimit: 3
-  # ttlSecondsAfterFinished: 100
   template:
     spec:
       restartPolicy: Never
       initContainers:
       - name: wait-for-postgres
-        image: postgres:17-alpine
+        image: k3d-higiliqs.local:12345/postgres:17-alpine
         command: ['sh', '-c', 
           'until pg_isready -h postgres -d postgres; do echo waiting for postgres; sleep 2; done;']
         env:
@@ -18,15 +17,23 @@ spec:
             value: postgres
           - name: PGUSER
             value: postgres
-        
           - name: POSTGRES_DB
             value: postgres
-
           - name: POSTGRES_PASSWORD
             valueFrom:
               secretKeyRef:
                 key: PG_PASSWORD
                 name: cluster-secrets
+      - name: wait-for-minio
+        image: k3d-higiliqs.local:12345/mc:RELEASE.2025-04-03T17-07-56Z
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            set -e
+            until mc alias set myminio http://minio-svc:9000 "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY"; do
+              echo "Waiting for MinIO to be ready..."
+              sleep 2
+            done
       containers:
       - name: saleor-setup
         image: k3d-higiliqs.local:12345/saleor:3.20.80
@@ -35,7 +42,7 @@ spec:
           - |
             python3 manage.py migrate &&
             python3 manage.py populatedb &&
-            python3 manage.py createsuperuser --noinput --email higiliqs@higiliquidos.com
+            python3 manage.py createsuperuser --noinput --email admin@higiliquidos.com
         envFrom:
           - configMapRef:
               name: saleor-config

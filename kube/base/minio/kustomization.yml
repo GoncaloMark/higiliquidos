@@ -4,3 +4,4 @@ resources:
 - minio-sts.yml
 - minio-svc.yml
 - minio-bucket-job.yml
+- minio-ingress.yml

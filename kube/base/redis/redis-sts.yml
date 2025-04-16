@@ -27,7 +27,7 @@ spec:
             path: REDIS_PASS
       initContainers:
       - name: config
-        image: redis:7.0.11-alpine
+        image: k3d-higiliqs.local:12345/redis:7.0.11-alpine
         command: ['sh', '-c', 'export REDIS_PASS=$(cat /etc/redis-auth/REDIS_PASS) && sed "s/\${REDIS_PASS}/$REDIS_PASS/g" /tmp/redis/redis.conf > /etc/redis/redis.conf']
         volumeMounts:
         - name: config
@@ -39,7 +39,7 @@ spec:
           readOnly: true
 
       - name: redis-init
-        image: redis:7.0.11-alpine
+        image: k3d-higiliqs.local:12345/redis:7.0.11-alpine
         command: 
         - /bin/sh
         - -c
@@ -61,7 +61,7 @@ spec:
           mountPath: /etc/redis
       containers:
       - name: redis
-        image: redis:7.0.11-alpine
+        image: k3d-higiliqs.local:12345/redis:7.0.11-alpine
         command: ['redis-server', '/etc/redis/redis.conf']
         ports:
         - containerPort: 6379
