@@ -9,17 +9,30 @@ spec:
       app: storefront
   template:
     metadata:
-        labels:
-          app: storefront
+      labels:
+        app: storefront
     spec:
       restartPolicy: Always
+      initContainers:
+        - name: get-traefik-ip
+          image: k3d-higiliqs.local:12345/kubectl:1.32.3
+          command:
+            - "sh"
+            - "-c"
+            - |
+              # Get Traefik service IP
+              TRAEFIK_IP=$(kubectl get svc --all-namespaces -o=jsonpath='{.items[?(@.metadata.name=="traefik")].spec.clusterIP}')
+              # Create a temporary hosts file and write the data
+              cp /etc/hosts /hosts/hosts
+              echo "$TRAEFIK_IP api.higiliquidos.deti.com s3.higiliquidos.deti.com" >> /hosts/hosts
+
+          volumeMounts:
+            - name: etc-hosts
+              mountPath: /hosts  
       containers:
         - name: storefront
           image: k3d-higiliqs.local:12345/saleor-storefront:0.1.0
           imagePullPolicy: Always
-          envFrom:
-            - secretRef:
-                name: storefront-secrets
           resources:
             requests:
               cpu: "10m"
@@ -31,13 +44,21 @@ spec:
             httpGet:
               path: /
               port: 3000
-            initialDelaySeconds: 90
+            initialDelaySeconds: 20
             timeoutSeconds: 10
           readinessProbe:
             httpGet:
               path: /
               port: 3000
-            initialDelaySeconds: 30
+            initialDelaySeconds: 20
             timeoutSeconds: 10
           ports:
-              - containerPort: 3000
+            - containerPort: 3000
+          volumeMounts:
+            - name: etc-hosts
+              mountPath: /etc/hosts  
+              subPath: hosts  
+              readOnly: true  
+      volumes:
+        - name: etc-hosts
+          emptyDir: {}  

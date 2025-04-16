@@ -19,10 +19,5 @@ secretGenerator:
   envs:
   - .env.saleor-dashboard
 
-- name: storefront-secrets
-  type: Opaque
-  envs:
-  - .env.storefront
-
 resources:
   - ../../base

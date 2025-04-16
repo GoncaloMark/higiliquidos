@@ -1,10 +1,12 @@
-kind: Service
 apiVersion: v1
+kind: Service
 metadata:
-  name:  storefront
+  name: storefront-external
 spec:
-  selector:
-    app:  storefront
+  type: LoadBalancer
   ports:
     - port: 80
       targetPort: 3000
+      protocol: TCP
+  selector:
+    app: storefront

@@ -6,13 +6,13 @@ metadata:
     traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
   rules:
-    - host: higiliquidos.deti.com
+    - host: store.higiliquidos.deti.com
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: storefront
+                name: storefront-external
                 port:
                   number: 80
