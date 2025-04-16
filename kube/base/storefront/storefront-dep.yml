@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: saleor-dashboard
+  name: storefront
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: saleor-dashboard
+      app: storefront
   template:
     metadata:
         labels:
-          app: saleor-dashboard
+          app: storefront
     spec:
       restartPolicy: Always
       containers:
-        - name: saleor-dashboard
-          image: k3d-higiliqs.local:12345/saleor-dashboard:3.20.34
+        - name: storefront
+          image: k3d-higiliqs.local:12345/saleor-storefront:0.1.0
           imagePullPolicy: Always
           envFrom:
             - secretRef:
-                name: saleor-dashboard-secrets
+                name: storefront-secrets
           resources:
             requests:
               cpu: "10m"
@@ -30,14 +30,14 @@ spec:
           livenessProbe:
             httpGet:
               path: /
-              port: 80
+              port: 3000
             initialDelaySeconds: 90
             timeoutSeconds: 10
           readinessProbe:
             httpGet:
               path: /
-              port: 80
+              port: 3000
             initialDelaySeconds: 30
             timeoutSeconds: 10
           ports:
-              - containerPort: 80
+              - containerPort: 3000

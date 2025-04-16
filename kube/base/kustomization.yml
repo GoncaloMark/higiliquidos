@@ -7,3 +7,4 @@ resources:
   - minio
   - saleor
   - saleor-dashboard
+  - storefront

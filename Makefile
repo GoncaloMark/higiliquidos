@@ -78,3 +78,12 @@ build_push_local:
 		echo "Pushing $$full_tag..."; \
 		docker push $$full_tag; \
 	done
+
+build_push_saleor:
+	cd repos/saleor && \
+		docker build -t $(LOCAL_REGISTRY)/saleor:3.20.80 . && \
+		docker push $(LOCAL_REGISTRY)/saleor:3.20.80
+
+	cd repos/saleor-dashboard && \
+		docker build -t $(LOCAL_REGISTRY)/saleor-dashboard:3.20.34 . && \
+		docker push $(LOCAL_REGISTRY)/saleor-dashboard:3.20.34
