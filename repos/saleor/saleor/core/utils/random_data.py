@@ -267,8 +267,8 @@ def create_products(products_data, placeholder_dir, create_images):
     for product in products_data:
         pk = product["pk"]
         # We are skipping products without images
-        if pk not in IMAGES_MAPPING:
-            continue
+        # if pk not in IMAGES_MAPPING:
+        #     continue
 
         defaults = dict(product["fields"])
         defaults["weight"] = get_weight(defaults["weight"])
@@ -314,8 +314,8 @@ def create_product_variants(variants_data, create_images):
         defaults["weight"] = get_weight(defaults["weight"])
         product_id = defaults.pop("product")
         # We have not created products without images
-        if product_id not in IMAGES_MAPPING:
-            continue
+        # if product_id not in IMAGES_MAPPING:
+        #     continue
         defaults["product_id"] = product_id
         set_field_as_money(defaults, "price_override")
         set_field_as_money(defaults, "cost_price")
@@ -327,7 +327,8 @@ def create_product_variants(variants_data, create_images):
             product.save(update_fields=["default_variant", "updated_at"])
         if create_images:
             image = variant.product.get_first_image()
-            VariantMedia.objects.get_or_create(variant=variant, media=image)
+            if image:
+                VariantMedia.objects.get_or_create(variant=variant, media=image) 
         quantity = random.randint(100, 500)
         create_stocks(variant, quantity=quantity)
 
