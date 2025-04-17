@@ -5,4 +5,3 @@ resources:
 - storefront-dep.yml
 - storefront-svc.yml
 - storefront-ingress.yml
-- cluster-role.yml

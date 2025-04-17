@@ -13,6 +13,27 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: saleor-external
+                name: saleor-api
+                port:
+                  number: 80
+
+--- 
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: saleor-build-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  rules:
+    - host: saleor-api.higiliquidos.svc.cluster.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: saleor-api
                 port:
                   number: 80

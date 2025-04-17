@@ -12,7 +12,7 @@ spec:
         args:
           - |
             set -e
-            until mc alias set myminio http://minio-svc:9000 "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY"; do
+            until mc alias set myminio http://minio-headless:9000 "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY"; do
               echo "Waiting for MinIO to be ready..."
               sleep 2
             done
