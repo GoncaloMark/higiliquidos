@@ -8,3 +8,4 @@ resources:
   - saleor
   - saleor-dashboard
   - storefront
+  - saleor-payments

@@ -5,6 +5,7 @@ SALEOR_VERSION = 3.20.80
 SALEOR_DASHBOARD_VERSION = 3.20.34
 SALEOR_PLATFORM_VERSION = latest
 STOREFRONT_VERSION = latest
+PAYMENT_VERSION = main
 
 LOCAL_REGISTRY = k3d-higiliqs.local:12345
 
@@ -12,7 +13,8 @@ REPOS = \
     https://github.com/saleor/saleor.git@$(SALEOR_VERSION) \
     https://github.com/saleor/saleor-dashboard.git@$(SALEOR_DASHBOARD_VERSION) \
     https://github.com/saleor/saleor-platform.git@$(SALEOR_PLATFORM_VERSION) \
-    https://github.com/saleor/storefront.git@$(STOREFRONT_VERSION)
+    https://github.com/saleor/storefront.git@$(STOREFRONT_VERSION) \
+	https://github.com/saleor/dummy-payment-app.git@$(PAYMENT_VERSION)
 
 .PHONY: cluster apply_all delete_all
 
@@ -69,7 +71,7 @@ delete_local_windows:
 delete_prod:
 	KUBECONFIG=/vagrant/kubeconfig kustomize build kube/overlays/prod | KUBECONFIG=/vagrant/kubeconfig kubectl delete -n higiliquidos -f -
 
-build_push_local:
+build_push_local: build_push_saleor
 	@for dockerfile in dockerfiles/Dockerfile.*; do \
 		from_tag=$$(grep '^FROM' $$dockerfile | head -n1 | awk '{print $$2}' | sed 's|.*/||'); \
 		full_tag=$(LOCAL_REGISTRY)/$${from_tag}; \
@@ -87,3 +89,16 @@ build_push_saleor:
 	cd repos/saleor-dashboard && \
 		docker build -t $(LOCAL_REGISTRY)/saleor-dashboard:3.20.34 . && \
 		docker push $(LOCAL_REGISTRY)/saleor-dashboard:3.20.34
+
+	cd scripts && \
+	docker build -t $(LOCAL_REGISTRY)/register-payments:0.1.0 . && \
+	docker push $(LOCAL_REGISTRY)/register-payments:0.1.0
+
+	cd repos/dummy-payment-app && \
+	docker build -f Dockerfile -t $(LOCAL_REGISTRY)/dummy-payment-app:0.1.0 . && \
+	docker push $(LOCAL_REGISTRY)/dummy-payment-app:0.1.0
+
+build_storefront:
+	cd repos/storefront && \
+	docker build --build-arg NEXT_PUBLIC_SALEOR_API_URL=http://saleor-api.higiliquidos.svc.cluster.local/graphql/ --build-arg NEXT_PUBLIC_STOREFRONT_URL=http://store.higiliquidos.deti.com/ -t $(LOCAL_REGISTRY)/saleor-storefront:0.1.0 --network=host --add-host saleor-api.higiliquidos.svc.cluster.local:127.0.0.1 . && \
+	docker push $(LOCAL_REGISTRY)/saleor-storefront:0.1.0

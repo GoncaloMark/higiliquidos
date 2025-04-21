@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payments-api
+  template:
+    metadata:
+      labels:
+        app: payments-api
+    spec:
+      containers:
+        - name: api
+          image: k3d-higiliqs.local:12345/dummy-payment-app:0.1.0
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              memory: "1024Mi"
+              cpu: "700m"
+            limits:
+              memory: "2048Mi"
+              cpu: "1000m"
+          livenessProbe:
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
