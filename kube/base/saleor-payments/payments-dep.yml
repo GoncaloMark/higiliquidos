@@ -22,6 +22,15 @@ spec:
           image: k3d-higiliqs.local:12345/dummy-payment-app:0.1.0
           ports:
             - containerPort: 3000
+          env:
+            - name: APP_IFRAME_BASE_URL
+              value: "http://payments-api.higiliquidos.deti.com"
+            - name: APP_API_BASE_URL
+              value: "http://payments-api.higiliquidos.deti.com"
+            - name: APL
+              value: "redis"
+            - name: REDIS_URL
+              value: "redis://redis-master.higiliquidos.svc.cluster.local:6379"
           resources:
             requests:
               memory: "1024Mi"

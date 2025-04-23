@@ -18,6 +18,16 @@ spec:
               until curl -sSf http://saleor-api.higiliquidos.svc.cluster.local/graphql/ > /dev/null; do
                 echo "Saleor API not yet ready..."; sleep 5;
               done
+        - name: wait-for-payments-api
+          image: k3d-higiliqs.local:12345/curl:8.13.0 
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for Payments API to be ready..."
+              until curl -sSf http://payments-api.higiliquidos.svc.cluster.local/api/manifest > /dev/null; do
+                echo "Payments API not yet ready..."; sleep 5;
+              done
       containers:
         - name: register
           image: k3d-higiliqs.local:12345/register-payments:0.1.0

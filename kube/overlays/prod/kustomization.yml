@@ -152,6 +152,10 @@ patches:
       - op: replace
         path: /spec/template/spec/initContainers/0/image
         value: registry.deti/higiliquidos/curl:8.13.0
+      
+      - op: replace
+        path: /spec/template/spec/initContainers/1/image
+        value: registry.deti/higiliquidos/curl:8.13.0
 
       - op: replace
         path: /spec/template/spec/containers/0/image

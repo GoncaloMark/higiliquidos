@@ -1,5 +1,7 @@
-import { APL, FileAPL, SaleorCloudAPL, UpstashAPL } from "@saleor/app-sdk/APL";
+import { APL, FileAPL, SaleorCloudAPL, UpstashAPL} from "@saleor/app-sdk/APL";
+import { RedisAPL} from "@saleor/app-sdk/APL/redis";
 import { SaleorApp } from "@saleor/app-sdk/saleor-app";
+import { createClient } from 'redis';
 import { invariant } from "./lib/invariant";
 
 /**
@@ -24,6 +26,13 @@ switch (process.env.APL) {
     // Require `UPSTASH_URL` and `UPSTASH_TOKEN` environment variables
     apl = new UpstashAPL();
     break;
+	case "redis":
+		apl = new RedisAPL({
+			client: createClient({
+				url: process.env.REDIS_URL,
+			}),
+			hashCollectionKey: "payment_app_auth",
+		})
   default:
     apl = new FileAPL({
       fileName: process.env.FILE_APL_PATH,
