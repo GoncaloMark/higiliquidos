@@ -20,6 +20,7 @@ spec:
       containers:
         - name: api
           image: k3d-higiliqs.local:12345/dummy-payment-app:0.1.0
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
           env:
@@ -30,7 +31,7 @@ spec:
             - name: APL
               value: "redis"
             - name: REDIS_URL
-              value: "redis://redis-master.higiliquidos.svc.cluster.local:6379"
+              value: "redis://:CHANGEME@redis-service:6379"
           resources:
             requests:
               memory: "1024Mi"

@@ -6,10 +6,11 @@ import { attachLoggerVercelRuntimeTransport } from "@/lib/logger/logger-vercel-t
 import { loggerContext } from "@/logger-context";
 
 logger.settings.maskValuesOfKeys = ["metadata", "username", "password", "apiKey"];
+attachLoggerConsoleTransport(logger);
 
-if (process.env.NODE_ENV !== "production") {
-  attachLoggerConsoleTransport(logger);
-}
+// if (process.env.NODE_ENV !== "production") {
+//   attachLoggerConsoleTransport(logger);
+// }
 
 if (typeof window === "undefined") {
   attachLoggerSentryTransport(logger);
