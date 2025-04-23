@@ -31,7 +31,7 @@ install_response = requests.post(SALEOR_URL, json={
     appInstall(
         input: {
         appName: "Payments App"
-        manifestUrl: "http://payments-api.higiliquidos.svc.cluster.local//api/manifest"
+        manifestUrl: "http://payments-api.higiliquidos.svc.cluster.local/api/manifest"
         permissions: [HANDLE_PAYMENTS]
         }
     ) {

@@ -44,10 +44,3 @@ spec:
               name: saleor-config
           - secretRef:
               name: saleor-secrets
-          env:
-            - name: ALLOWED_CLIENT_HOSTS
-              value: "payments-api.higiliquidos.svc.cluster.local,saleor-api.higiliquidos.svc.cluster.local,dash.higiliquidos.deti.com,localhost,127.0.0.1,store.higiliquidos.deti.com,storefront,saleor-api,api.higiliquidos.deti.com,saleor-api"
-            - name: CORS_ALLOWED_ORIGINS
-              value: "http://payments-api.higiliquidos.svc.cluster.local,http://saleor-api.higiliquidos.svc.cluster.local,http://dash.higiliquidos.deti.com,http://localhost:9000,http://store.higiliquidos.deti.com,http://storefront:3000,http://saleor-api"
-            - name: ALLOWED_HOSTS
-              value: "payments-api.higiliquidos.svc.cluster.local,saleor-api.higiliquidos.svc.cluster.local,dash.higiliquidos.deti.com,localhost,127.0.0.1,store.higiliquidos.deti.com,storefront,saleor-api, api.higiliquidos.deti.com,saleor-api"

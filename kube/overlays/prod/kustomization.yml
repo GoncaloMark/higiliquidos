@@ -1,6 +1,27 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+generatorOptions:
+ disableNameSuffixHash: true
+
+secretGenerator:
+- name: cluster-secrets
+  type: Opaque
+  envs:
+  - .env
+
+- name: saleor-secrets
+  type: Opaque
+  envs:
+  - .env.saleor
+  files:
+    - RSA_PRIVATE_KEY=RSA_PRIVATE_KEY.pem
+
+- name: saleor-dashboard-secrets
+  type: Opaque
+  envs:
+  - .env.saleor-dashboard
+
 resources:
   - ../../base
 
@@ -49,6 +70,7 @@ patches:
       - op: replace
         path: /spec/template/spec/containers/0/image
         value: registry.deti/higiliquidos/postgres:17-alpine
+        
       - op: replace
         path: /spec/template/spec/initContainers/0/image
         value: registry.deti/higiliquidos/postgres:17-alpine
@@ -64,7 +86,7 @@ patches:
 
   - target:
       kind: Job 
-      name: create-minio-bucket
+      name: create-minio-buckets
     patch: |-
       - op: replace
         path: /spec/template/spec/containers/0/image
@@ -76,12 +98,21 @@ patches:
       name: saleor-api
     patch: |-
       - op: replace
+        path: /spec/template/spec/initContainers/0/image
+        value: registry.deti/higiliquidos/kubectl:1.32.3
+
+      - op: replace
         path: /spec/template/spec/containers/0/image
         value: registry.deti/higiliquidos/saleor:3.20.80
+        
   - target:
       kind: Deployment
       name: saleor-worker
     patch: |-
+      - op: replace
+        path: /spec/template/spec/initContainers/0/image
+        value: registry.deti/higiliquidos/kubectl:1.32.3
+
       - op: replace
         path: /spec/template/spec/containers/0/image
         value: registry.deti/higiliquidos/saleor:3.20.80
@@ -91,5 +122,73 @@ patches:
       name: saleor-setup
     patch: |-
       - op: replace
+        path: /spec/template/spec/initContainers/0/image
+        value: registry.deti/higiliquidos/postgres:17-alpine
+
+      - op: replace
+        path: /spec/template/spec/initContainers/1/image
+        value: registry.deti/higiliquidos/mc:RELEASE.2025-04-03T17-07-56Z
+
+      - op: replace
         path: /spec/template/spec/containers/0/image
         value: registry.deti/higiliquidos/saleor:3.20.80
+
+  - target:
+      kind: Deployment
+      name: saleor-dashboard
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/initContainers/0/image
+        value: registry.deti/higiliquidos/kubectl:1.32.3
+
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: registry.deti/higiliquidos/saleor-dashboard:3.20.34
+
+  - target:
+      kind: Job
+      name: register-payments-app
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/initContainers/0/image
+        value: registry.deti/higiliquidos/curl:8.13.0
+
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: registry.deti/higiliquidos/register-payments:0.1.0
+
+  - target:
+      kind: Deployment
+      name: payments-api
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/initContainers/0/image
+        value: registry.deti/higiliquidos/kubectl:1.32.3
+
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: registry.deti/higiliquidos/dummy-payment-app:0.1.0
+
+  - target:
+      kind: Deployment
+      name: payments-api
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/initContainers/0/image
+        value: registry.deti/higiliquidos/kubectl:1.32.3
+
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: registry.deti/higiliquidos/dummy-payment-app:0.1.0
+
+  - target:
+      kind: Deployment
+      name: storefront
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/initContainers/0/image
+        value: registry.deti/higiliquidos/kubectl:1.32.3
+
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: registry.deti/higiliquidos/saleor-storefront:0.1.0

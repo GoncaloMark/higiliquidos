@@ -11,7 +11,7 @@ spec:
       - name: wait-for-postgres
         image: k3d-higiliqs.local:12345/postgres:17-alpine
         command: ['sh', '-c', 
-          'until pg_isready -h postgres -d postgres; do echo waiting for postgres; sleep 2; done;']
+          'until pg_isready -h postgres -d postgres; do echo waiting for postgres; sleep 10; done;']
         env:
           - name: POSTGRES_USER
             value: postgres

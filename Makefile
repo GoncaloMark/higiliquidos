@@ -65,11 +65,8 @@ apply_prod:
 delete_local:
 	KUBECONFIG= kustomize build kube/overlays/local | KUBECONFIG= kubectl delete -n higiliquidos -f -
 
-delete_local_windows:
-	kustomize build kube/overlays/local | kubectl delete -n higiliquidos -f -
-
 delete_prod:
-	KUBECONFIG=/vagrant/kubeconfig kustomize build kube/overlays/prod | KUBECONFIG=/vagrant/kubeconfig kubectl delete -n higiliquidos -f -
+	kustomize build kube/overlays/prod | kubectl delete -n higiliquidos -f -
 
 build_push_local: build_push_saleor
 	@for dockerfile in dockerfiles/Dockerfile.*; do \

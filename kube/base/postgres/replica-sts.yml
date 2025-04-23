@@ -27,6 +27,7 @@ spec:
       initContainers:
         - name: setup-replica-data-directory
           image: k3d-higiliqs.local:12345/postgres:17-alpine
+          imagePullPolicy: IfNotPresent
           
           env:
             - name: PGPASSWORD
