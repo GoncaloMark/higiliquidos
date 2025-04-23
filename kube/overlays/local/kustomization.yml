@@ -7,5 +7,17 @@ secretGenerator:
   envs:
   - .env
 
+- name: saleor-secrets
+  type: Opaque
+  envs:
+  - .env.saleor
+  files:
+    - RSA_PRIVATE_KEY=RSA_PRIVATE_KEY.pem
+
+- name: saleor-dashboard-secrets
+  type: Opaque
+  envs:
+  - .env.saleor-dashboard
+
 resources:
   - ../../base

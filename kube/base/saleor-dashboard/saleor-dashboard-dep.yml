@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: saleor-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: saleor-dashboard
+  template:
+    metadata:
+        labels:
+          app: saleor-dashboard
+    spec:
+      restartPolicy: Always
+      initContainers:
+      - name: wait-for-saleor-setup
+        image: k3d-higiliqs.local:12345/kubectl:1.32.3
+        command: ['sh', '-c', 
+          'until kubectl get job saleor-setup -n higiliquidos -o jsonpath="{.status.conditions[?(@.type==\"Complete\")].status}" | grep -q True; do echo waiting for saleor-setup job; sleep 5; done;']
+      containers:
+        - name: saleor-dashboard
+          image: k3d-higiliqs.local:12345/saleor-dashboard:3.20.34
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: saleor-dashboard-secrets
+          resources:
+            requests:
+              cpu: "10m"
+              memory: "128M"
+            limits:
+              cpu: "1000m"
+              memory: "512M"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 90
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 30
+            timeoutSeconds: 10
+          ports:
+              - containerPort: 80

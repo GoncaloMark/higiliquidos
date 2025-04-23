@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-minio-buckets
+spec:
+  template:
+    spec:
+      containers:
+      - name: create-bucket
+        image: k3d-higiliqs.local:12345/mc:RELEASE.2025-04-03T17-07-56Z
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            set -e
+            until mc alias set myminio http://minio-headless:9000 "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY"; do
+              echo "Waiting for MinIO to be ready..."
+              sleep 2
+            done
+            mc mb myminio/$AWS_MEDIA_BUCKET_NAME || echo "media-bucket already exists"
+            mc mb myminio/$AWS_MEDIA_PRIVATE_BUCKET_NAME || echo "private-bucket already exists"
+            mc mb myminio/$AWS_STORAGE_BUCKET_NAME || echo "storage-bucket already exists"
+            mc anonymous set download myminio/$AWS_MEDIA_BUCKET_NAME || echo "media-bucket set to public"
+        envFrom:
+          - secretRef:
+              name: saleor-secrets
+      restartPolicy: OnFailure

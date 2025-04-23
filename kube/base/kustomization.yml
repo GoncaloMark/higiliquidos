@@ -5,3 +5,7 @@ resources:
   - postgres
   - redis
   - minio
+  - saleor
+  - saleor-dashboard
+  - storefront
+  - saleor-payments

@@ -114,51 +114,36 @@ DUMMY_STAFF_PASSWORD = "password"
 DEFAULT_CURRENCY = os.environ.get("DEFAULT_CURRENCY", "USD")
 
 IMAGES_MAPPING = {
-    126: ["saleor-headless-omnichannel-book.png"],
-    127: [
-        "saleor-white-plimsolls-1.png",
-        "saleor-white-plimsolls-2.png",
-        "saleor-white-plimsolls-3.png",
-        "saleor-white-plimsolls-4.png",
-    ],
-    128: [
-        "saleor-blue-plimsolls-1.png",
-        "saleor-blue-plimsolls-2.png",
-        "saleor-blue-plimsolls-3.png",
-        "saleor-blue-plimsolls-4.png",
-    ],
-    129: ["saleor-dash-force-1.png", "saleor-dash-force-2.png"],
-    130: ["saleor-pauls-blanace-420-1.png", "saleor-pauls-blanace-420-2.png"],
-    131: ["saleor-grey-hoodie.png"],
-    132: ["saleor-blue-hoodie.png"],
-    133: ["saleor-white-hoodie.png"],
-    134: ["saleor-ascii-shirt-front.png", "saleor-ascii-shirt-back.png"],
-    135: ["saleor-team-tee-front.png", "saleor-team-tee-front.png"],
-    136: ["saleor-polo-shirt-front.png", "saleor-polo-shirt-back.png"],
-    137: ["saleor-blue-polygon-tee-front.png", "saleor-blue-polygon-tee-back.png"],
-    138: ["saleor-dark-polygon-tee-front.png", "saleor-dark-polygon-tee-back.png"],
-    141: ["saleor-beanie-1.png", "saleor-beanie-2.png"],
-    143: ["saleor-neck-warmer.png"],
-    144: ["saleor-sunnies.png"],
-    145: ["saleor-battle-tested-book.png"],
-    146: ["saleor-enterprise-cloud-book.png"],
-    147: ["saleor-own-your-stack-and-data-book.png"],
-    150: ["saleor-mighty-mug.png"],
-    151: ["saleor-cushion-blue.png"],
-    152: ["saleor-apple-drink.png"],
-    153: ["saleor-bean-drink.png"],
-    154: ["saleor-banana-drink.png"],
-    155: ["saleor-carrot-drink.png"],
-    156: ["saleor-sunnies-dark.png"],
-    157: [
-        "saleor-monospace-white-tee-front.png",
-        "saleor-monospace-white-tee-back.png",
-    ],
-    160: ["saleor-gift-100.png"],
-    161: ["saleor-white-cubes-tee-front.png", "saleor-white-cubes-tee-back.png"],
-    162: ["saleor-white-parrot-cushion.png"],
-    163: ["saleor-gift-500.png"],
-    164: ["saleor-gift-50.png"],
+    1: ["product_01.jpg"],
+    2: ["product_02.webp"],
+    3: ["product_03.jpg"],
+    4: ["product_04.jpg"],
+    5: ["product_05.jpg"],
+    6: ["product_06.png"],
+    7: ["product_07.png"],
+    8: ["product_08.jpg"],
+    9: ["product_09.png"],
+    10: ["product_10.png"],
+    11: ["product_11.jpg"],
+    12: ["product_12.jpg"],
+    13: ["product_13.jpg"],
+    14: ["product_14.jpg"],
+    15: ["product_15.jpg"],
+    16: ["product_16.jpg"],
+    17: ["product_17.jpg"],
+    18: ["product_18.png"],
+    19: ["product_19.jpeg"],
+    20: ["product_20.png"],
+    21: ["product_21.png"],
+    22: ["product_22.jpg"],
+    23: ["product_23.png"],
+    24: ["product_24.png"],
+    25: ["product_25.jpg"],
+    26: ["product_26.png"],
+    27: ["product_27.png"],
+    28: ["product_28.png"],
+    29: ["product_29.png"],
+    30: ["product_30.jpg"],
 }
 
 CATEGORY_IMAGES = {
@@ -267,8 +252,8 @@ def create_products(products_data, placeholder_dir, create_images):
     for product in products_data:
         pk = product["pk"]
         # We are skipping products without images
-        if pk not in IMAGES_MAPPING:
-            continue
+        # if pk not in IMAGES_MAPPING:
+        #     continue
 
         defaults = dict(product["fields"])
         defaults["weight"] = get_weight(defaults["weight"])
@@ -314,8 +299,8 @@ def create_product_variants(variants_data, create_images):
         defaults["weight"] = get_weight(defaults["weight"])
         product_id = defaults.pop("product")
         # We have not created products without images
-        if product_id not in IMAGES_MAPPING:
-            continue
+        # if product_id not in IMAGES_MAPPING:
+        #     continue
         defaults["product_id"] = product_id
         set_field_as_money(defaults, "price_override")
         set_field_as_money(defaults, "cost_price")
@@ -327,7 +312,8 @@ def create_product_variants(variants_data, create_images):
             product.save(update_fields=["default_variant", "updated_at"])
         if create_images:
             image = variant.product.get_first_image()
-            VariantMedia.objects.get_or_create(variant=variant, media=image)
+            if image:
+                VariantMedia.objects.get_or_create(variant=variant, media=image) 
         quantity = random.randint(100, 500)
         create_stocks(variant, quantity=quantity)
 

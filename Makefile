@@ -5,18 +5,22 @@ SALEOR_VERSION = 3.20.80
 SALEOR_DASHBOARD_VERSION = 3.20.34
 SALEOR_PLATFORM_VERSION = latest
 STOREFRONT_VERSION = latest
+PAYMENT_VERSION = main
+
+LOCAL_REGISTRY = k3d-higiliqs.local:12345
 
 REPOS = \
     https://github.com/saleor/saleor.git@$(SALEOR_VERSION) \
     https://github.com/saleor/saleor-dashboard.git@$(SALEOR_DASHBOARD_VERSION) \
     https://github.com/saleor/saleor-platform.git@$(SALEOR_PLATFORM_VERSION) \
-    https://github.com/saleor/storefront.git@$(STOREFRONT_VERSION)
+    https://github.com/saleor/storefront.git@$(STOREFRONT_VERSION) \
+	https://github.com/saleor/dummy-payment-app.git@$(PAYMENT_VERSION)
 
 .PHONY: cluster apply_all delete_all
 
 cluster:
 	k3d registry create higiliqs.local -p 12345
-	k3d cluster create higiliqs -p "8081:80@loadbalancer" --agents 5 --registry-use k3d-higiliqs.local:12345
+	k3d cluster create higiliqs -p "80:80@loadbalancer" --agents 5 --registry-use k3d-higiliqs.local:12345
 
 clone_all:
 	mkdir -p repos
@@ -51,11 +55,47 @@ apply_local:
 	KUBECONFIG= kubectl apply -f kube/namespace.yml && \
 	KUBECONFIG= kustomize build kube/overlays/local | KUBECONFIG= kubectl apply -n higiliquidos -f -
 
+apply_local_windows:
+	kubectl apply -f kube/namespace.yml && \
+	kustomize build kube/overlays/local | kubectl apply -n higiliquidos -f -
+
 apply_prod:
-	KUBECONFIG=/vagrant/kubeconfig kustomize build kube/overlays/prod | KUBECONFIG=/vagrant/kubeconfig kubectl apply -n higiliquidos -f -
+	kustomize build kube/overlays/prod | kubectl apply -n higiliquidos -f -
 
 delete_local:
 	KUBECONFIG= kustomize build kube/overlays/local | KUBECONFIG= kubectl delete -n higiliquidos -f -
 
 delete_prod:
-	KUBECONFIG=/vagrant/kubeconfig kustomize build kube/overlays/prod | KUBECONFIG=/vagrant/kubeconfig kubectl delete -n higiliquidos -f -
+	kustomize build kube/overlays/prod | kubectl delete -n higiliquidos -f -
+
+build_push_local: build_push_saleor
+	@for dockerfile in dockerfiles/Dockerfile.*; do \
+		from_tag=$$(grep '^FROM' $$dockerfile | head -n1 | awk '{print $$2}' | sed 's|.*/||'); \
+		full_tag=$(LOCAL_REGISTRY)/$${from_tag}; \
+		echo "Building $$dockerfile as $$full_tag..."; \
+		docker build -f $$dockerfile -t $$full_tag .; \
+		echo "Pushing $$full_tag..."; \
+		docker push $$full_tag; \
+	done
+
+build_push_saleor:
+	cd repos/saleor && \
+		docker build -t $(LOCAL_REGISTRY)/saleor:3.20.80 . && \
+		docker push $(LOCAL_REGISTRY)/saleor:3.20.80
+
+	cd repos/saleor-dashboard && \
+		docker build -t $(LOCAL_REGISTRY)/saleor-dashboard:3.20.34 . && \
+		docker push $(LOCAL_REGISTRY)/saleor-dashboard:3.20.34
+
+	cd scripts && \
+	docker build -t $(LOCAL_REGISTRY)/register-payments:0.1.0 . && \
+	docker push $(LOCAL_REGISTRY)/register-payments:0.1.0
+
+	cd repos/dummy-payment-app && \
+	docker build -f Dockerfile -t $(LOCAL_REGISTRY)/dummy-payment-app:0.1.0 . && \
+	docker push $(LOCAL_REGISTRY)/dummy-payment-app:0.1.0
+
+build_storefront:
+	cd repos/storefront && \
+	docker build --build-arg NEXT_PUBLIC_SALEOR_API_URL=http://saleor-api.higiliquidos.svc.cluster.local/graphql/ --build-arg NEXT_PUBLIC_STOREFRONT_URL=http://store.higiliquidos.deti.com/ -t $(LOCAL_REGISTRY)/saleor-storefront:0.1.0 --network=host --add-host saleor-api.higiliquidos.svc.cluster.local:127.0.0.1 . && \
+	docker push $(LOCAL_REGISTRY)/saleor-storefront:0.1.0

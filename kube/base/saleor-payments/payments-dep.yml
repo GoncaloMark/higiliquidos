@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payments-api
+  template:
+    metadata:
+      labels:
+        app: payments-api
+    spec:
+      initContainers:
+      - name: wait-for-saleor-setup
+        image: k3d-higiliqs.local:12345/kubectl:1.32.3
+        command: ['sh', '-c', 
+          'until kubectl get job saleor-setup -n higiliquidos -o jsonpath="{.status.conditions[?(@.type==\"Complete\")].status}" | grep -q True; do echo waiting for saleor-setup job; sleep 5; done;']
+      containers:
+        - name: api
+          image: k3d-higiliqs.local:12345/dummy-payment-app:0.1.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            - name: APP_IFRAME_BASE_URL
+              value: "http://payments-api.higiliquidos.deti.com"
+            - name: APP_API_BASE_URL
+              value: "http://payments-api.higiliquidos.deti.com"
+            - name: APL
+              value: "redis"
+            - name: REDIS_URL
+              value: "redis://:CHANGEME@redis-service:6379"
+          resources:
+            requests:
+              memory: "1024Mi"
+              cpu: "700m"
+            limits:
+              memory: "2048Mi"
+              cpu: "1000m"
+          livenessProbe:
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 10
+            timeoutSeconds: 10

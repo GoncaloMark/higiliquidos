@@ -1,0 +1,10 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name:  saleor-dashboard
+spec:
+  selector:
+    app:  saleor-dashboard
+  ports:
+    - port: 80
+      targetPort: 80
