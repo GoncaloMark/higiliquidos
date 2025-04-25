@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-PROD_REG=registry.deti/higiliquidos
+PROD_REG=k3d-higiliqs.local:12345
 
 for dockerfile in ../dockerfiles/Dockerfile.*; do
     from_tag=$(grep '^FROM' "$dockerfile" | head -n1 | awk '{print $2}' | sed 's|.*/||')

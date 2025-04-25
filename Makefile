@@ -1,4 +1,4 @@
-# TODO: Change env vars to files
+# TODO: Change env vars to files | Clean up secrets
 
 # Repository versions
 SALEOR_VERSION = 3.20.80
@@ -87,13 +87,13 @@ build_push_saleor:
 		docker build -t $(LOCAL_REGISTRY)/saleor-dashboard:3.20.34 . && \
 		docker push $(LOCAL_REGISTRY)/saleor-dashboard:3.20.34
 
-	cd scripts && \
-	docker build -t $(LOCAL_REGISTRY)/register-payments:0.1.0 . && \
-	docker push $(LOCAL_REGISTRY)/register-payments:0.1.0
-
 	cd repos/dummy-payment-app && \
 	docker build -f Dockerfile -t $(LOCAL_REGISTRY)/dummy-payment-app:0.1.0 . && \
 	docker push $(LOCAL_REGISTRY)/dummy-payment-app:0.1.0
+
+	cd scripts && \
+	docker build -t $(LOCAL_REGISTRY)/register-payments:0.1.0 . && \
+	docker push $(LOCAL_REGISTRY)/register-payments:0.1.0
 
 build_storefront:
 	cd repos/storefront && \

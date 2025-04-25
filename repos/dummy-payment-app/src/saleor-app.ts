@@ -1,9 +1,10 @@
-import { APL, FileAPL, SaleorCloudAPL, UpstashAPL} from "@saleor/app-sdk/APL";
-import { RedisAPL} from "@saleor/app-sdk/APL/redis";
+import { APL, FileAPL, SaleorCloudAPL, UpstashAPL } from "@saleor/app-sdk/APL";
 import { SaleorApp } from "@saleor/app-sdk/saleor-app";
-import { createClient } from 'redis';
 import { invariant } from "./lib/invariant";
-import { createLogger } from "./lib/logger/create-logger";
+
+import { Redis } from 'ioredis';
+
+import { RedisAPL } from './redis-apl';
 
 /**
  * By default auth data are stored in the `.auth-data.json` (FileAPL).
@@ -12,9 +13,6 @@ import { createLogger } from "./lib/logger/create-logger";
  * To read more about storing auth data, read the
  * [APL documentation](https://github.com/saleor/saleor-app-sdk/blob/main/docs/apl.md)
  */
-
-const logger = createLogger("Create-Saleor-APP");
-
 export let apl: APL;
 switch (process.env.APL) {
   case "saleor-cloud":
@@ -30,43 +28,27 @@ switch (process.env.APL) {
     // Require `UPSTASH_URL` and `UPSTASH_TOKEN` environment variables
     apl = new UpstashAPL();
     break;
-	case "redis":
-        const redisClient = createClient({
-            url: process.env.REDIS_URL,
-        })
-        redisClient.on('error', error => {
-            logger.error(`Redis client error:`, error);
-        });
-        redisClient.on('connect', () => {
-            logger.info(`Redis client connected`);
-        });
-        redisClient.on('ready', () => {
-            logger.info(`Redis client ready`);
-        });
-        redisClient.on('end', () => {
-            logger.info(`Redis client disconnected`);
-        });
-        redisClient.on('reconnecting', () => {
-            logger.info(`Redis client reconnecting`);
-        });
-
-		apl = new RedisAPL({
-			client: redisClient
-		})
   default:
-    apl = new FileAPL({
-      fileName: process.env.FILE_APL_PATH,
+    // apl = new FileAPL({
+    //   fileName: process.env.FILE_APL_PATH,
+    // });
+
+    const sentinel = new Redis({
+      name: 'mymaster',
+      sentinels: [{
+        host: 'redis-sentinel-service',
+        port: 26379
+      }],
+      password: process.env.REDIS_PASS
     });
+  
+
+    apl = new RedisAPL({
+      client: sentinel,
+      hashCollectionKey: 'saleor_app_auth', 
+    });
+    
 }
-
-apl.isReady().then(() => {
-    logger.info("APL is ready");
-    }
-).catch((error) => {
-    logger.error("APL is not ready", error);
-    process.exit(1);
-});
-
 
 export const saleorApp = new SaleorApp({
   apl,

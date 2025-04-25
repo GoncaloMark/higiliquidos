@@ -23,15 +23,6 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
-          env:
-            - name: APP_IFRAME_BASE_URL
-              value: "http://payments-api.higiliquidos.deti.com"
-            - name: APP_API_BASE_URL
-              value: "http://payments-api.higiliquidos.deti.com"
-            - name: APL
-              value: "redis"
-            - name: REDIS_URL
-              value: "redis://:CHANGEME@redis-service:6379"
           resources:
             requests:
               memory: "1024Mi"
@@ -49,3 +40,6 @@ spec:
               port: 3000
             initialDelaySeconds: 10
             timeoutSeconds: 10
+          envFrom:
+            - secretRef:
+                name: cluster-secrets
