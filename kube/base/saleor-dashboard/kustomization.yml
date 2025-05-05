@@ -5,4 +5,4 @@ resources:
 - saleor-dashboard-dep.yml
 - saleor-dashboard-svc.yml
 - saleor-dashboard-ingress.yml
-# - register-apps-job.yml
+- register-apps-job.yml
