@@ -5,3 +5,4 @@ resources:
 - payments-dep.yml
 - payments-svc.yml
 - payments-ingress.yml
+- payments-hpa.yml

@@ -5,3 +5,4 @@ resources:
 - storefront-dep.yml
 - storefront-svc.yml
 - storefront-ingress.yml
+- storefront-hpa.yml
