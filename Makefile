@@ -51,7 +51,7 @@ pull_all:
 		fi; \
 	done
 
-apply_local:
+apply_local: add_operator
 	KUBECONFIG= kubectl apply -f kube/namespace.yml && \
 	KUBECONFIG= kustomize build kube/overlays/local | KUBECONFIG= kubectl apply -n higiliquidos -f -
 
@@ -99,3 +99,7 @@ build_storefront:
 	cd repos/storefront && \
 	docker build --build-arg NEXT_PUBLIC_SALEOR_API_URL=http://saleor-api.higiliquidos.svc.cluster.local/graphql/ --build-arg NEXT_PUBLIC_STOREFRONT_URL=http://store.higiliquidos.deti.com/ -t $(LOCAL_REGISTRY)/saleor-storefront:0.1.0 --network=host --add-host saleor-api.higiliquidos.svc.cluster.local:127.0.0.1 . && \
 	docker push $(LOCAL_REGISTRY)/saleor-storefront:0.1.0
+
+add_operator:
+	kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.17.2/cert-manager.yaml
+	kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml

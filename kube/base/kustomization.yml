@@ -9,3 +9,4 @@ resources:
   - saleor-dashboard
   - storefront
   - saleor-payments
+  - otel
