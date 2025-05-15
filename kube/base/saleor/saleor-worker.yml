@@ -29,14 +29,61 @@ spec:
           - saleor
           - --app=saleor.celeryconf:app
           - worker
+          - --max-tasks-per-child=10
+          - --concurrency=4
+          - --max-memory-per-child=524288
           - --loglevel=info
-          - -B
         resources:
           requests:
-            memory: "4096Mi"
-            cpu: "200m"
+            memory: "512Mi"
+            cpu: "250m"
           limits:
-            memory: "8192Mi"
+            memory: "1024Mi"
+            cpu: "500m"
+        envFrom:
+          - configMapRef:
+              name: saleor-config
+          - secretRef:
+              name: saleor-secrets
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: saleor-beat
+spec:
+  replicas: 1  
+  selector:
+    matchLabels:
+      app: saleor-beat
+  template:
+    metadata:
+      labels:
+        app: saleor-beat
+    spec:
+      restartPolicy: Always
+      initContainers:
+      - name: wait-for-saleor-setup
+        image: k3d-higiliqs.local:12345/kubectl:1.32.3  
+        command: ['sh', '-c', 
+          'until kubectl get job saleor-setup -n higiliquidos -o jsonpath="{.status.conditions[?(@.type==\"Complete\")].status}" | grep -q True; do echo waiting for saleor-setup job; sleep 5; done;']
+      containers:
+      - name: saleor-beat
+        image: k3d-higiliqs.local:12345/saleor:3.20.80
+        imagePullPolicy: Always
+        command:
+          - celery
+        args:
+          - --app=saleor.celeryconf:app
+          - beat
+          - --loglevel=info
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1024Mi"
             cpu: "500m"
         envFrom:
           - configMapRef:
