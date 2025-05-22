@@ -102,4 +102,8 @@ build_storefront:
 
 add_operator:
 	kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.17.2/cert-manager.yaml
+	kubectl wait --for=condition=Available --timeout=120s deployment/cert-manager -n cert-manager
+	kubectl wait --for=condition=Available --timeout=120s deployment/cert-manager-webhook -n cert-manager
+	kubectl wait --for=condition=Available --timeout=120s deployment/cert-manager-cainjector -n cert-manager
 	kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml
+	kubectl wait --for=condition=Available --timeout=120s deployment/opentelemetry-operator-controller-manager -n opentelemetry-operator-system
