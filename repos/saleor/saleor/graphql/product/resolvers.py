@@ -15,6 +15,7 @@ from ..core.tracing import traced_resolver
 from ..core.utils import from_global_id_or_error
 from ..utils import get_user_or_app_from_context
 from ..utils.filters import filter_by_period
+from saleor.core.metrics import product_click_counter
 
 
 def resolve_categories(info: ResolveInfo, level=None):
@@ -80,13 +81,28 @@ def resolve_product(
     qs = models.Product.objects.using(database_connection_name).visible_to_user(
         requestor, channel, limited_channel_access
     )
+
+    product = None
     if id:
         _type, id = from_global_id_or_error(id, "Product")
-        return qs.filter(id=id).first()
+        product = qs.filter(id=id).first()
     elif slug:
-        return qs.filter(slug=slug).first()
+        product = qs.filter(slug=slug).first()
     else:
-        return qs.filter(external_reference=external_reference).first()
+        product = qs.filter(external_reference=external_reference).first()
+
+    if product:
+        # Increment the product click counter with product ID as attribute
+        product_click_counter.add(
+            1,
+            {
+                "product_id": str(product.id),
+                "product_name": product.name,
+                "channel": channel.slug if channel else "none",
+            },
+        )
+
+    return product
 
 
 @traced_resolver

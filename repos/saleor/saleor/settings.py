@@ -22,11 +22,20 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management.utils import get_random_secret_key
 from django.core.validators import URLValidator
 from graphql.execution import executor
+from opentelemetry.sdk import resources
+from opentelemetry import metrics
+from opentelemetry.sdk.metrics import MeterProvider
+from opentelemetry.sdk.metrics.export import (
+    ConsoleMetricExporter,
+    PeriodicExportingMetricReader,
+)
+from opentelemetry.exporter.otlp.proto.grpc.metric_exporter import (
+    OTLPMetricExporter,
+)
 from pytimeparse import parse
 from sentry_sdk.integrations.celery import CeleryIntegration
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import ignore_logger
-
 from . import PatchedSubscriberExecutionContext, __version__
 from .account.i18n_rules_override import i18n_rules_override
 from .core.db.patch import patch_db
@@ -43,6 +52,38 @@ from .patch_local import patch_local
 from .plugins.openid_connect.patch import patch_authlib
 
 django_stubs_ext.monkeypatch()
+
+resource = resources.Resource(
+    attributes={
+        resources.SERVICE_NAME: "SALEOR_API",
+        resources.SERVICE_NAMESPACE: "HIGILIQUIDOS",
+    }
+)
+
+# Configure metric export (default to console but can be configured for other exporters)
+metric_exporter = os.environ.get("OTEL_METRIC_EXPORTER", "console").lower()
+
+if metric_exporter == "otlp":
+    # For OTLP (OpenTelemetry Protocol) export to collector
+    otlp_endpoint = os.environ.get(
+        "OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317"
+    )
+    exporter = OTLPMetricExporter(endpoint=otlp_endpoint)
+else:
+    exporter = ConsoleMetricExporter()
+
+# Configure how often metrics are exported (default 15 seconds)
+export_interval_ms = int(os.environ.get("OTEL_METRIC_EXPORT_INTERVAL_MS", "15000"))
+metric_reader = PeriodicExportingMetricReader(
+    exporter, export_interval_millis=export_interval_ms
+)
+provider = MeterProvider(metric_readers=[metric_reader], resource=resource)
+
+# Sets the global default meter provider
+metrics.set_meter_provider(provider)
+
+# Creates a meter from the global meter provider
+meter = metrics.get_meter("saleor")
 
 
 def get_list(text):
@@ -107,8 +148,8 @@ INTERNAL_IPS = get_list(os.environ.get("INTERNAL_IPS", "127.0.0.1"))
 # are not supported.
 DB_CONN_MAX_AGE = int(os.environ.get("DB_CONN_MAX_AGE", 0))
 
-PRIMARY_DB_URL = os.environ.get("PRIMARY_DB", None) 
-REPLICA_DB_URL = os.environ.get("REPLICA_DB", None) 
+PRIMARY_DB_URL = os.environ.get("PRIMARY_DB", None)
+REPLICA_DB_URL = os.environ.get("REPLICA_DB", None)
 
 DATABASE_CONNECTION_DEFAULT_NAME = "default"
 DATABASE_CONNECTION_REPLICA_NAME = "replica"
@@ -118,7 +159,8 @@ DATABASES = {
         default=PRIMARY_DB_URL, conn_max_age=600
     ),
     DATABASE_CONNECTION_REPLICA_NAME: dj_database_url.config(
-        default=REPLICA_DB_URL, conn_max_age=600,
+        default=REPLICA_DB_URL,
+        conn_max_age=600,
     ),
 }
 
@@ -572,7 +614,9 @@ CELERY_BROKER_URL = (
     os.environ.get("CELERY_BROKER_URL", os.environ.get("CLOUDAMQP_URL")) or ""
 )
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", None)
-CELERY_BROKER_TRANSPORT_OPTIONS = {"master_name": os.environ.get("REDIS_MASTER", "mymaster")}
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    "master_name": os.environ.get("REDIS_MASTER", "mymaster")
+}
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_ALWAYS_EAGER = not CELERY_BROKER_URL
 CELERY_TASK_SERIALIZER = "json"
