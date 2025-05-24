@@ -18,14 +18,9 @@ spec:
     env:
       - name: OTEL_EXPORTER_OTLP_ENDPOINT
         value: "http://higiliquidos-collector:4318"
-      - name: OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED
-        value: 'true'
       - name: DJANGO_SETTINGS_MODULE
         value: saleor.settings
-      - name: OTEL_LOGS_EXPORTER
-        value: 'otlp'
 ---
-# Update your Deployment to use the instrumentation
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -40,7 +35,7 @@ spec:
       labels:
         app: saleor-api
       annotations:
-        instrumentation.opentelemetry.io/inject-python: "saleor-instrumentation" # This enables auto-instrumentation
+        instrumentation.opentelemetry.io/inject-python: "saleor-instrumentation" 
     spec:
       initContainers:
       - name: wait-for-saleor-setup

@@ -6,3 +6,4 @@ resources:
   - jaeger.yml
   - grafana.yml
   - prometheus.yml 
+  - promtail.yml
