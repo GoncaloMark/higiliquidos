@@ -101,18 +101,21 @@ class Command(BaseCommand):
             self.stdout.write(msg)
         create_products_by_schema(self.placeholders_dir, create_images)
         self.stdout.write("Created products")
-        for msg in create_catalogue_promotions(2):
-            self.stdout.write(msg)
-        for msg in create_order_promotions(2):
-            self.stdout.write(msg)
-        for msg in create_vouchers():
-            self.stdout.write(msg)
-        for msg in create_users(user_password, 20):
-            self.stdout.write(msg)
-        for msg in create_orders(20):
-            self.stdout.write(msg)
-        for msg in create_gift_cards():
-            self.stdout.write(msg)
+        
+        # Essential business data only - test data creation commented out
+        # for msg in create_catalogue_promotions(2):
+        #     self.stdout.write(msg)
+        # for msg in create_order_promotions(2):
+        #     self.stdout.write(msg)
+        # for msg in create_vouchers():
+        #     self.stdout.write(msg)
+        # for msg in create_users(user_password, 20):
+        #     self.stdout.write(msg)
+        # for msg in create_orders(20):
+        #     self.stdout.write(msg)
+        # for msg in create_gift_cards():
+        #     self.stdout.write(msg)
+        
         for msg in create_menus():
             self.stdout.write(msg)
         # for msg in create_checkout_with_preorders():
@@ -135,7 +138,8 @@ class Command(BaseCommand):
         if not options["skipsequencereset"]:
             self.sequence_reset()
 
-        for msg in create_permission_groups(staff_password):
-            self.stdout.write(msg)
-        for msg in create_staffs(staff_password):
-            self.stdout.write(msg)
+        # Test staff accounts creation commented out
+        # for msg in create_permission_groups(staff_password):
+        #     self.stdout.write(msg)
+        # for msg in create_staffs(staff_password):
+        #     self.stdout.write(msg)
