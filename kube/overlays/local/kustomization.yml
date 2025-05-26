@@ -7,6 +7,11 @@ secretGenerator:
   envs:
   - .env
 
+- name: exporter-secrets
+  type: Opaque
+  envs:
+  - .env.exporters
+
 - name: saleor-secrets
   type: Opaque
   envs:

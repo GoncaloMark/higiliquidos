@@ -6,3 +6,18 @@ resources:
   - jaeger.yml
   - grafana.yml
   - prometheus.yml 
+  - promtail.yml
+  - exporters.yml
+
+configMapGenerator:
+  - name: grafana-dashboards
+    files:
+      - dashboards/pg_dash.json
+      - dashboards/redis_dash.json
+
+  - name: grafana-dashboards-config
+    files:
+      - dashboards.yml
+
+generatorOptions:
+  disableNameSuffixHash: true

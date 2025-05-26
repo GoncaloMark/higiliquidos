@@ -33,9 +33,6 @@ spec:
         namespace: otel
         send_timestamps: true
         metric_expiration: 180m
-      
-      otlphttp:
-        endpoint: http://loki:3100/otlp
 
     service:
       pipelines:
@@ -48,8 +45,3 @@ spec:
           receivers: [otlp]
           processors: [batch]
           exporters: [prometheus]
-        
-        logs:
-          receivers: [otlp]
-          processors: [batch]
-          exporters: [debug, otlphttp]
