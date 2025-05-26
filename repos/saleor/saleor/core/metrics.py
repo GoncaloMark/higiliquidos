@@ -1,7 +1,7 @@
 from opentelemetry import metrics
 
 # Get a meter from the global meter provider
-meter = metrics.get_meter("saleor")
+meter = metrics.get_meter("saleor-meter")
 
 # Create a counter for product clicks
 product_click_counter = meter.create_counter(

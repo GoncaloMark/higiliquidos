@@ -7,6 +7,7 @@ from django.core.management.base import BaseCommand
 from django.db import connection
 
 from ....account.utils import create_superuser
+from django.contrib.auth import get_user_model
 from ...utils.random_data import (
     add_address_to_admin,
     create_catalogue_promotions,
@@ -89,6 +90,12 @@ class Command(BaseCommand):
             "DummyCreditCardGatewayPlugin",
         ]
         create_images = not options["withoutimages"]
+
+        # check if already exists any user in the database
+        User = get_user_model()
+        if User.objects.exists():
+            self.stdout.write("Users already exist in the database. Skipping the seeding.")
+            return
         for msg in create_channels():
             self.stdout.write(msg)
         for msg in create_shipping_zones():

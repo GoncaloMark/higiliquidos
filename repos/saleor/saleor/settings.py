@@ -68,7 +68,7 @@ if metric_exporter == "otlp":
     otlp_endpoint = os.environ.get(
         "OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317"
     )
-    exporter = OTLPMetricExporter(endpoint=otlp_endpoint)
+    exporter = OTLPMetricExporter(endpoint=otlp_endpoint + "/v1/metrics")
 else:
     exporter = ConsoleMetricExporter()
 
@@ -83,7 +83,7 @@ provider = MeterProvider(metric_readers=[metric_reader], resource=resource)
 metrics.set_meter_provider(provider)
 
 # Creates a meter from the global meter provider
-meter = metrics.get_meter("saleor")
+meter = metrics.get_meter("saleor-meter")
 
 
 def get_list(text):

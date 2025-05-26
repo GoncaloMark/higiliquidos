@@ -2,46 +2,50 @@
 setlocal enabledelayedexpansion
 
 set "PROD_REG=k3d-higiliqs.local:12345"
+cd ..
+set "BASE_DIR=%cd%"
+@REM set "BASE_DIR=%BASE_DIR:~0,-1%"
+set "DOCKERFILES_DIR=%BASE_DIR%\dockerfiles"
+set "REPOS_DIR=%BASE_DIR%\repos"
+
+echo "BASE_DIR: %BASE_DIR%"
+echo "DOCKERFILES_DIR: %DOCKERFILES_DIR%"
+echo "REPOS_DIR: %REPOS_DIR%"
 
 REM Loop through Dockerfiles
-@REM for %%F in (..\dockerfiles\Dockerfile.*) do (
-@REM     for /f "tokens=2 delims= " %%A in ('findstr /b "FROM" %%F ^| more +0') do (
-@REM         set "TAG=%%A"
-@REM         for %%T in (!TAG!) do (
-@REM             for /f "delims=/ tokens=2" %%X in ("%%T") do (
-@REM                 set "from_tag=%%X"
-@REM                 set "full_tag=%PROD_REG%/!from_tag!"
-@REM                 echo Building %%F as !full_tag!...
-@REM                 @REM docker build -f %%F -t !full_tag! .
-@REM                 echo Pushing !full_tag!...
-@REM                 docker push !full_tag!
-@REM             )
-@REM         )
-@REM     )
-@REM )
+echo "Building and pushing Dockerfiles from %DOCKERFILES_DIR%..."
+cd %DOCKERFILES_DIR%
+for %%F in (Dockerfile.*) do (
+    echo "Processing %%F..."
+    
+    REM Extract tag from the FROM line in Dockerfile
+    for /f "tokens=2 delims= " %%T in ('findstr /b "FROM" "%%F"') do (
+        set "from_tag=%%~nxT"
+        set "full_tag=%PROD_REG%/!from_tag!"
+        
+        echo "Building !full_tag! from %%F..."
+        docker build -f %%F -t !full_tag! .
+        echo "Pushing !full_tag!..."
+        docker push !full_tag!
+    )
+)
 
-@REM cd ../dockerfiles
-@REM docker build -f Dockerfile.postgres -t "%PROD_REG%/postgres:17-alpine" .
-@REM docker push "%PROD_REG%/postgres:17-alpine"
+echo "Building and pushing Saleor, Saleor Dashboard, Dummy Payment App, and Register Payments..."
 
-@REM docker build -f Dockerfile.redis -t "%PROD_REG%/redis:7.0.11-alpine" .
-@REM docker push "%PROD_REG%/redis:7.0.11-alpine"
+cd %REPOS_DIR%\saleor
+docker build -t "%PROD_REG%/saleor:3.20.80" .
+docker push "%PROD_REG%/saleor:3.20.80"
 
+cd %REPOS_DIR%\saleor-dashboard
+docker build -t "%PROD_REG%/saleor-dashboard:3.20.34" .
+docker push "%PROD_REG%/saleor-dashboard:3.20.34"
 
-@REM cd ..\repos\saleor
-@REM docker build -t "%PROD_REG%/saleor:3.20.80" .
-@REM docker push "%PROD_REG%/saleor:3.20.80"
-
-@REM cd ..\saleor-dashboard
-@REM docker build -t "%PROD_REG%/saleor-dashboard:3.20.34" .
-@REM docker push "%PROD_REG%/saleor-dashboard:3.20.34"
-
-cd ..\repos\dummy-payment-app
+cd %REPOS_DIR%\dummy-payment-app
 docker build -t "%PROD_REG%/dummy-payment-app:0.1.0" .
 docker push "%PROD_REG%/dummy-payment-app:0.1.0"
 
-@REM cd ..\..\scripts
-@REM docker build -t "%PROD_REG%/register-payments:0.1.0" .
-@REM docker push "%PROD_REG%/register-payments:0.1.0"
+cd %BASE_DIR%\scripts
+docker build -t "%PROD_REG%/register-payments:0.1.0" .
+docker push "%PROD_REG%/register-payments:0.1.0"
 
 endlocal
