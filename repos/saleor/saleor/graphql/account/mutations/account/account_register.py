@@ -159,6 +159,16 @@ class AccountRegister(ModelMutation):
         with traced_atomic_transaction():
             user.is_confirmed = False
             user.save()
+            
+            # Track user registration metric
+            from .....core.metrics import user_registration_counter
+            user_registration_counter.add(
+                1,
+                {
+                    "channel": cleaned_input.get("channel", ""),
+                    "confirmed": str(user.is_confirmed),
+                }
+            )
             if site.settings.enable_account_confirmation_by_email:
                 # Notifications will be deprecated in the future
                 token = default_token_generator.make_token(user)

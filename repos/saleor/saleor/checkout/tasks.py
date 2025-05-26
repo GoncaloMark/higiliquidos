@@ -19,6 +19,9 @@ from .fetch import fetch_checkout_info, fetch_checkout_lines
 from .models import Checkout, CheckoutLine
 from .utils import delete_checkouts
 
+# Import metrics for cart abandonment tracking
+from ..core.metrics import unfinished_cart_counter
+
 task_logger: logging.Logger = get_task_logger(__name__)
 
 
@@ -96,6 +99,23 @@ def delete_expired_checkouts(
     has_more: bool = True
     for batch_number in range(batch_count):
         checkout_ids = list(qs.values_list("pk", flat=True))
+        
+        # Track cart abandonment metrics before deletion
+        # Get checkout details for metrics tracking
+        if checkout_ids:
+            checkouts_to_delete = Checkout.objects.filter(pk__in=checkout_ids).select_related('channel', 'user')
+            for checkout in checkouts_to_delete:
+                # Track each abandoned cart
+                unfinished_cart_counter.add(
+                    1,
+                    {
+                        "checkout_id": str(checkout.token),
+                        "channel": checkout.channel.slug if checkout.channel else "none",
+                        "user": str(checkout.user.id) if checkout.user else "anonymous",
+                        "abandonment_reason": "expired",
+                    }
+                )
+        
         deleted_count = delete_checkouts(checkout_ids)
         total_deleted += deleted_count
 

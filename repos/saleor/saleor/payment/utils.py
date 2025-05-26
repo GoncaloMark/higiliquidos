@@ -1053,7 +1053,8 @@ def create_failed_transaction_event(
     event: TransactionEvent,
     cause: str,
 ):
-    return TransactionEvent.objects.create(
+    # Create the failed transaction event
+    failed_event = TransactionEvent.objects.create(
         type=get_failed_type_based_on_event(event),
         amount_value=event.amount_value,
         currency=event.currency,
@@ -1063,6 +1064,25 @@ def create_failed_transaction_event(
         psp_reference=event.psp_reference,
         related_granted_refund_id=event.related_granted_refund_id,
     )
+    
+    # Track the payment failure for analytics
+    from ..core.metrics import payment_failure_counter
+    
+    # Get the transaction to get more context
+    transaction = event.transaction
+    
+    # Increment the payment failure counter with relevant attributes
+    payment_failure_counter.add(
+        1,
+        {
+            "failure_type": str(get_failed_type_based_on_event(event)),
+            "currency": str(event.currency),
+            "channel": transaction.checkout.channel.slug if transaction.checkout else 
+                      (transaction.order.channel.slug if transaction.order else "unknown"),
+        }
+    )
+    
+    return failed_event
 
 
 def authorization_success_already_exists(transaction_id: int) -> bool:

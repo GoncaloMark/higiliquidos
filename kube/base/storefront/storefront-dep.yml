@@ -43,3 +43,6 @@ spec:
             timeoutSeconds: 10
           ports:
             - containerPort: 3000
+          # env:
+          #   - name: NEXT_PUBLIC_SALEOR_API_URL
+          #     value: "http://host.k3d.internal:8000/graphql/"
