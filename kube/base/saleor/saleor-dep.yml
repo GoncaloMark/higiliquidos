@@ -49,10 +49,10 @@ spec:
             - containerPort: 8000
           resources:
             requests:
-              memory: "512Mi"
+              memory: "1024Mi"
               cpu: "250m"
             limits:
-              memory: "1024Mi"
+              memory: "2048Mi"
               cpu: "500m"
           livenessProbe:
             tcpSocket:
