@@ -903,7 +903,24 @@ if JAEGER_HOST:
 REDIS_URL = os.environ.get("REDIS_URL")
 if REDIS_URL:
     CACHE_URL = os.environ.setdefault("CACHE_URL", REDIS_URL)
-CACHES = {"default": django_cache_url.config()}
+
+DJANGO_REDIS_CONNECTION_FACTORY = 'django_redis.pool.SentinelConnectionFactory'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://mymaster/0',
+        'OPTIONS': {
+            'PASSWORD': 'CHANGEME',
+            'CLIENT_CLASS': 'django_redis.client.SentinelClient',
+            'SENTINELS': [
+                ('redis-sentinel-service', 26379),
+            ],
+            'SENTINEL_KWARGS': {},
+            'CONNECTION_POOL_CLASS': 'redis.sentinel.SentinelConnectionPool'
+        }
+    }
+}
 CACHES["default"]["TIMEOUT"] = parse(os.environ.get("CACHE_TIMEOUT", "7 days"))
 
 JWT_EXPIRE = True
