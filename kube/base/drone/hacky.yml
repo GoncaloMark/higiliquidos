@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: k3d-registry
+  namespace: higiliquidos
+spec:
+  ports:
+  - port: 12345
+    protocol: TCP
+    targetPort: 12345
+
+---
+
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: k3d-registry
+  namespace: higiliquidos
+subsets:
+- addresses:
+  - ip: 172.17.0.1  
+  ports:
+  - port: 12345

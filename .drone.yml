@@ -1,0 +1,28 @@
+kind: pipeline
+type: kubernetes
+name: build-and-push
+
+steps:
+- name: build and push
+  image: docker:dind
+  volumes:
+  - name: dockersock 
+    path: /var/run
+  commands:
+    - sleep 5
+    - docker build -f dockerfiles/Dockerfile.curl -t k3d-registry.higiliquidos.svc.cluster.local:12345/curl:111 .
+    - docker push k3d-registry.higiliquidos.svc.cluster.local:12345/curl:111
+
+services:
+- name: docker
+  image: docker:dind
+  privileged: true
+  volumes:
+  - name: dockersock
+    path: /var/run
+  command: ["--insecure-registry", "k3d-registry.higiliquidos.svc.cluster.local:12345"]
+
+
+volumes:
+- name: dockersock 
+  temp: {}

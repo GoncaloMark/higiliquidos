@@ -1477,7 +1477,7 @@
       "slug": "cleaningsupplies",
       "kind": "normal",
       "has_variants": true,
-      "is_shipping_required": false,
+      "is_shipping_required": true,
       "is_digital": false,
       "weight": "1000.0:g"
     }
