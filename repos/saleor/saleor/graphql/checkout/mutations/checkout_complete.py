@@ -339,8 +339,6 @@ class CheckoutComplete(BaseMutation, I18nMixin):
         # Track the completed checkout for conversion rate calculation
         from ....core.metrics import (
             completed_checkout_counter,
-            order_value_histogram,
-            total_sales_counter
         )
         
         # Track completed checkout
@@ -352,26 +350,6 @@ class CheckoutComplete(BaseMutation, I18nMixin):
                 "user": str(customer.id) if customer else "anonymous",
             }
         )
-        
-        # Track the total sales value and order value for AOV calculation
-        if order:
-            # Record the order value in the histogram for AOV calculations
-            order_value_histogram.record(
-                float(order.total_gross_amount),
-                {
-                    "currency": order.currency,
-                    "channel": order.channel.slug,
-                }
-            )
-            
-            # Increment the total sales counter
-            total_sales_counter.add(
-                float(order.total_gross_amount),
-                {
-                    "currency": order.currency,
-                    "channel": order.channel.slug,
-                }
-            )
 
         # If gateway returns information that additional steps are required we need
         # to inform the frontend and pass all required data
