@@ -210,13 +210,13 @@ class Command(BaseCommand):
                     error_msg = self._validate_username(
                         username, verbose_field_name, database
                     )
-                    if error_msg.startswith("Error:"):
-                        # If the error message starts with "Error:", it is
-                        # already formatted for stderr.
-                        self.stderr.write(error_msg)
-                        return
                     # Otherwise, it is a validation error message.
                     if error_msg:
+                        if error_msg.startswith("Error:"):
+                            # If the error message starts with "Error:", it is
+                            # already formatted for stderr.
+                            self.stderr.write(error_msg)
+                            return
                         raise CommandError(error_msg)
 
                 user_data[self.UserModel.USERNAME_FIELD] = username
