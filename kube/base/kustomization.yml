@@ -10,3 +10,4 @@ resources:
   - storefront
   - saleor-payments
   - otel
+  - drone
