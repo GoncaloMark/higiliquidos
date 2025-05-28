@@ -25,10 +25,9 @@ spec:
         command:
           - celery
         args:
-          - -A
-          - saleor
           - --app=saleor.celeryconf:app
           - worker
+          - -E
           - --max-tasks-per-child=10
           - --concurrency=4
           - --max-memory-per-child=524288
@@ -74,9 +73,10 @@ spec:
         imagePullPolicy: Always
         command:
           - celery
-        args:
+        args: 
           - --app=saleor.celeryconf:app
           - beat
+          - --scheduler=saleor.schedulers.schedulers.DatabaseScheduler
           - --loglevel=info
         resources:
           requests:
@@ -113,3 +113,70 @@ roleRef:
   kind: Role
   name: job-reader
   apiGroup: rbac.authorization.k8s.io
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: saleor-flower
+spec:
+  replicas: 1  
+  selector:
+    matchLabels:
+      app: saleor-flower
+  template:
+    metadata:
+      labels:
+        app: saleor-flower
+    spec:
+      restartPolicy: Always
+      initContainers:
+      - name: wait-for-saleor-setup
+        image: k3d-higiliqs.local:12345/kubectl:1.32.3  
+        command: ['sh', '-c', 
+          'until kubectl get job saleor-setup -n higiliquidos -o jsonpath="{.status.conditions[?(@.type==\"Complete\")].status}" | grep -q True; do echo waiting for saleor-setup job; sleep 5; done;']
+      containers:
+      - name: saleor-flower
+        image: k3d-higiliqs.local:12345/saleor:3.20.80
+        imagePullPolicy: Always
+        command:
+          - celery
+        args: 
+          - --app=saleor.celeryconf:app
+          - flower
+          - --enable_events
+        ports:
+        - containerPort: 5555
+          name: flower
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1024Mi"
+            cpu: "500m"
+        envFrom:
+          - configMapRef:
+              name: saleor-config
+          - secretRef:
+              name: saleor-secrets
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: saleor-flower
+  labels:
+    app: saleor-flower
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "5555"
+    prometheus.io/path: "/metrics"
+spec:
+  ports:
+  - port: 5555
+    targetPort: 5555
+    name: flower
+  selector:
+    app: saleor-flower

@@ -89,6 +89,7 @@ documentation = "https://docs.saleor.io/"
   opentelemetry-exporter-otlp = "^1.33.1"
   opentelemetry-distro = "^0.54b1"
   django-redis = "^5.4.0"
+  flower = "^2.0.1"
 
     [tool.poetry.dependencies.psycopg]
     version = "^3.1.8"

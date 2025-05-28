@@ -15,6 +15,7 @@ configMapGenerator:
       - dashboards/pg_dash.json
       - dashboards/redis_dash.json
       - dashboards/saleor_dash.json
+      - dashboards/celery_dash.json
 
   - name: grafana-dashboards-config
     files:
