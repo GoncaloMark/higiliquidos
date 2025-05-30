@@ -1,3 +1,27 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: worker-instrumentation
+  namespace: higiliquidos
+spec:
+  exporter:
+    endpoint: http://higiliquidos-collector:4317
+  propagators:
+    - tracecontext
+    - baggage
+    - b3
+  sampler:
+    type: parentbased_traceidratio
+    argument: "1"
+  python:
+    image: k3d-higiliqs.local:12345/autoinstrumentation-python:0.54b1
+    env:
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: "http://higiliquidos-collector:4318"
+      - name: OTEL_PYTHON_DISABLED_INSTRUMENTATIONS
+        value: django
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -11,6 +35,8 @@ spec:
     metadata:
       labels:
         app: saleor-worker
+      annotations:
+        instrumentation.opentelemetry.io/inject-python: "worker-instrumentation" 
     spec:
       restartPolicy: Always
       initContainers:
@@ -60,6 +86,8 @@ spec:
     metadata:
       labels:
         app: saleor-beat
+      annotations:
+        instrumentation.opentelemetry.io/inject-python: "worker-instrumentation" 
     spec:
       restartPolicy: Always
       initContainers:
