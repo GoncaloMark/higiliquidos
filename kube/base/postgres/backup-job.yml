@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgresql-backup-cron-job
+  namespace: higiliquidos
+spec:
+  schedule: "0 8,20 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: postgresql-backup-job-pod
+            image: k3d-higiliqs.local:12345/bckpg:0.1.0
+            env:
+              - name: S3_BUCKET
+                value: "pg-backup"
+              - name: PG_PASS
+                valueFrom:
+                  secretKeyRef:
+                    key: PG_PASSWORD
+                    name: cluster-secrets
+              - name: AWS_ACCESS_KEY_ID
+                valueFrom:
+                  secretKeyRef:
+                    key: AWS_ACCESS_KEY_ID
+                    name: saleor-secrets
+              - name: AWS_SECRET_ACCESS_KEY
+                valueFrom:
+                  secretKeyRef:
+                    key: AWS_SECRET_ACCESS_KEY
+                    name: saleor-secrets
+            imagePullPolicy: Always
+            args:
+            - /bin/bash
+            - -c
+            - cd /home/root; ls; bash backup-pg.sh;
+          restartPolicy: OnFailure
+      backoffLimit: 3

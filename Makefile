@@ -70,7 +70,11 @@ delete_prod:
 
 build_push_local: build_push_saleor
 	@for dockerfile in dockerfiles/Dockerfile.*; do \
-		from_tag=$$(grep '^FROM' $$dockerfile | head -n1 | awk '{print $$2}' | sed 's|.*/||'); \
+		if [ "$$dockerfile" = "dockerfiles/Dockerfile.bckpg" ]; then \
+			from_tag="bckpg:0.1.0"; \
+		else \
+			from_tag=$$(grep '^FROM' $$dockerfile | head -n1 | awk '{print $$2}' | sed 's|.*/||'); \
+		fi; \
 		full_tag=$(LOCAL_REGISTRY)/$${from_tag}; \
 		echo "Building $$dockerfile as $$full_tag..."; \
 		docker build -f $$dockerfile -t $$full_tag .; \

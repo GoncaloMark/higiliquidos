@@ -14,3 +14,4 @@ resources:
 - master-sts.yml
 - replica-sts.yml
 - pg-svc.yml
+- backup-job.yml

@@ -106,7 +106,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(rate(flower_events_total{type=\"task-started\"}[5m])) by (worker)",
+          "expr": "sum(rate(flower_events_total{type=\"task-received\"}[5m])) by (worker)",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"

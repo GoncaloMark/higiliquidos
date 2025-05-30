@@ -1,0 +1,10 @@
+FROM minio/mc:RELEASE.2025-04-03T17-07-56Z AS mc
+FROM postgres:17-alpine
+
+COPY --from=mc /usr/bin/mc /usr/bin/mc
+
+RUN apk add --no-cache ca-certificates
+
+COPY ../kube/base/postgres/config/backup-pg.sh /home/root/ 
+
+USER root 
