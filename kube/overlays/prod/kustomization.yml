@@ -9,6 +9,11 @@ secretGenerator:
   type: Opaque
   envs:
   - .env
+  
+- name: exporter-secrets
+  type: Opaque
+  envs:
+  - .env.exporters
 
 - name: saleor-secrets
   type: Opaque
@@ -184,7 +189,6 @@ patches:
       - op: replace
         path: /spec/template/spec/containers/0/image
         value: registry.deti/higiliquidos/dummy-payment-app:0.1.0
-
   - target:
       kind: Deployment
       name: storefront
@@ -196,3 +200,103 @@ patches:
       - op: replace
         path: /spec/template/spec/containers/0/image
         value: registry.deti/higiliquidos/saleor-storefront:0.1.0
+
+  # Redis Exporter patches
+  - target:
+      kind: Deployment
+      name: redis-exporter
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: registry.deti/higiliquidos/redis_exporter:v1.73.0
+  # Postgres Exporter patches
+  - target:
+      kind: Deployment
+      name: postgres-exporter
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: registry.deti/higiliquidos/postgres-exporter:v0.17.1
+
+  # OpenTelemetry infrastructure patches
+  - target:
+      kind: Deployment
+      name: grafana
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: registry.deti/higiliquidos/grafana:12.0.0
+
+  - target:
+      kind: OpenTelemetryCollector
+      name: jaeger-inmemory-instance
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: registry.deti/higiliquidos/jaeger:latest
+
+  - target:
+      kind: StatefulSet
+      name: loki
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: registry.deti/higiliquidos/loki:3.5.0
+
+  - target:
+      kind: Deployment
+      name: prometheus
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: registry.deti/higiliquidos/prometheus:v3.4.0
+
+  - target:
+      kind: DaemonSet
+      name: promtail
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: registry.deti/higiliquidos/promtail:2.9.0
+
+  # Backup job patches
+  - target:
+      kind: CronJob
+      name: postgresql-backup-cron-job
+    patch: |-
+      - op: replace
+        path: /spec/jobTemplate/spec/template/spec/containers/0/image
+        value: registry.deti/higiliquidos/bckpg:0.1.0
+
+  # OpenTelemetry auto-instrumentation patches
+  - target:
+      kind: Instrumentation
+      name: saleor-instrumentation
+    patch: |-
+      - op: replace
+        path: /spec/python/image
+        value: registry.deti/higiliquidos/autoinstrumentation-python:0.54b1
+
+  - target:
+      kind: Instrumentation
+      name: worker-instrumentation
+    patch: |-
+      - op: replace
+        path: /spec/python/image
+        value: registry.deti/higiliquidos/autoinstrumentation-python:0.54b1
+
+  - target:
+      kind: Instrumentation
+      name: payments-instrumentation
+    patch: |-
+      - op: replace
+        path: /spec/nodejs/image
+        value: registry.deti/higiliquidos/autoinstrumentation-nodejs:0.58.1
+
+  - target:
+      kind: Instrumentation
+      name: stf-instrumentation
+    patch: |-
+      - op: replace
+        path: /spec/nodejs/image
+        value: registry.deti/higiliquidos/autoinstrumentation-nodejs:0.58.1
