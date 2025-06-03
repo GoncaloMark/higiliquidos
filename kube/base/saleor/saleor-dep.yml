@@ -13,6 +13,15 @@ spec:
   sampler:
     type: parentbased_traceidratio
     argument: "1"
+  env:
+    - name: OTEL_EXPORTER_OTLP_INSECURE
+      value: "true"
+    - name: OTEL_LOG_LEVEL
+      value: "debug"
+    - name: OTEL_TRACES_EXPORTER
+      value: "otlp" 
+    - name: OTEL_METRICS_EXPORTER
+      value: "otlp"
   python:
     image: k3d-higiliqs.local:12345/autoinstrumentation-python:0.54b1
     env:
@@ -20,6 +29,10 @@ spec:
         value: "http://higiliquidos-collector:4318"
       - name: DJANGO_SETTINGS_MODULE
         value: saleor.settings
+      - name: OTEL_TRACES_EXPORTER
+        value: otlp_proto_http
+      - name: OTEL_METRICS_EXPORTER
+        value: "otlp_proto_http"
 ---
 apiVersion: apps/v1
 kind: Deployment
