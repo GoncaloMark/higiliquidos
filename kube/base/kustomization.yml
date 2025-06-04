@@ -11,3 +11,4 @@ resources:
   - saleor-payments
   - otel
   - drone
+  - locust

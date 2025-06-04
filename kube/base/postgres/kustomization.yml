@@ -15,3 +15,4 @@ resources:
 - replica-sts.yml
 - pg-svc.yml
 - backup-job.yml
+- pg-bouncer.yml

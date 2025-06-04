@@ -156,11 +156,11 @@ DATABASE_CONNECTION_REPLICA_NAME = "replica"
 
 DATABASES = {
     DATABASE_CONNECTION_DEFAULT_NAME: dj_database_url.config(
-        default=PRIMARY_DB_URL, conn_max_age=600
+        default=PRIMARY_DB_URL, conn_max_age=60,
     ),
     DATABASE_CONNECTION_REPLICA_NAME: dj_database_url.config(
         default=REPLICA_DB_URL,
-        conn_max_age=600,
+        conn_max_age=60,
     ),
 }
 

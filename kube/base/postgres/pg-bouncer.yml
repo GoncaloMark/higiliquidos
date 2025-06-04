@@ -1,0 +1,95 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pgbouncer-config
+data:
+  pgbouncer.ini: |
+    # Inject
+
+    [pgbouncer]
+    listen_addr = *
+    listen_port = 6432
+    auth_type = md5
+    auth_file = /etc/pgbouncer/userlist.txt
+    pool_mode = session
+    max_client_conn = 400
+    default_pool_size = 100
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgbouncer-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pgbouncer
+  template:
+    metadata:
+      labels:
+        app: pgbouncer
+    spec:
+      initContainers:
+      - name: config-init
+        image: k3d-higiliqs.local:12345/busybox:1.37
+        env:
+        - name: PG_USER
+          value: postgres
+        - name: PG_PASS
+          valueFrom:
+            secretKeyRef:
+              name: cluster-secrets
+              key: PG_PASSWORD
+        command:
+        - /bin/sh
+        - -c
+        - |
+          cat > /tmp/databases.ini << EOF
+          [databases]
+          write = host=postgres port=5432 dbname=postgres user=$PG_USER password=$PG_PASS
+          read = host=postgres-replica port=5432 dbname=postgres user=$PG_USER password=$PG_PASS
+          EOF
+          
+          sed '/# Inject/r /tmp/databases.ini' /etc/pgbouncer-template/pgbouncer.ini > /etc/pgbouncer/pgbouncer.ini
+          
+          sed -i '/# Inject/d' /etc/pgbouncer/pgbouncer.ini
+          
+          echo "\"$PG_USER\" \"$PG_PASS\"" > /etc/pgbouncer/userlist.txt
+          
+          echo "Configuration files created successfully"
+          cat /etc/pgbouncer/pgbouncer.ini
+          echo "---"
+          cat /etc/pgbouncer/userlist.txt
+        volumeMounts:
+        - name: pgbouncer-config-template
+          mountPath: /etc/pgbouncer-template
+        - name: pgbouncer-runtime-config
+          mountPath: /etc/pgbouncer
+      containers:
+      - name: pgbouncer
+        image: k3d-higiliqs.local:12345/pgbouncer:v1.24.1-p0
+        ports:
+        - containerPort: 6432
+        volumeMounts:
+        - name: pgbouncer-runtime-config
+          mountPath: /etc/pgbouncer
+      volumes:
+      - name: pgbouncer-config-template
+        configMap:
+          name: pgbouncer-config
+      - name: pgbouncer-runtime-config
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pgbouncer-service
+spec:
+  type: ClusterIP
+  selector:
+    app: pgbouncer
+  ports:
+  - port: 6432
+    targetPort: 6432
