@@ -88,7 +88,6 @@ patches:
       - op: replace
         path: /spec/template/spec/containers/0/image
         value: registry.deti/higiliquidos/minio:RELEASE.2025-04-03T14-56-28Z
-
   - target:
       kind: Job 
       name: create-minio-buckets
@@ -96,6 +95,17 @@ patches:
       - op: replace
         path: /spec/template/spec/containers/0/image
         value: registry.deti/higiliquidos/mc:RELEASE.2025-04-03T17-07-56Z
+      - op: add
+        path: /spec/template/spec/affinity
+        value:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+                - matchExpressions:
+                  - key: cpu
+                    operator: In
+                    values:
+                    - x86-64-v2
 
   # Saleor
   - target:
