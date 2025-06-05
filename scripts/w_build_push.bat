@@ -18,16 +18,22 @@ cd %DOCKERFILES_DIR%
 for %%F in (Dockerfile.*) do (
     echo "Processing %%F..."
     
-    REM Extract tag from the FROM line in Dockerfile
-    for /f "tokens=2 delims= " %%T in ('findstr /b "FROM" "%%F"') do (
-        set "from_tag=%%~nxT"
-        set "full_tag=%PROD_REG%/!from_tag!"
-        
-        echo "Building !full_tag! from %%F..."
-        docker build -f %%F -t !full_tag! .
-        echo "Pushing !full_tag!..."
-        docker push !full_tag!
+    REM Check if this is Dockerfile.bckpg and set custom tag
+    if "%%F"=="Dockerfile.bckpg" (
+        set "from_tag=bckpg:0.1.0"
+    ) else (
+        REM Extract tag from the FROM line in Dockerfile
+        for /f "tokens=2 delims= " %%T in ('findstr /b "FROM" "%%F"') do (
+            set "from_tag=%%~nxT"
+        )
     )
+    
+    set "full_tag=%PROD_REG%/!from_tag!"
+    
+    echo "Building !full_tag! from %%F..."
+    docker build -f %%F -t !full_tag! .
+    echo "Pushing !full_tag!..."
+    docker push !full_tag!
 )
 
 echo "Building and pushing Saleor, Saleor Dashboard, Dummy Payment App, and Register Payments..."
