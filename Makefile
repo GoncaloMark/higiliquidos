@@ -53,6 +53,7 @@ pull_all:
 
 apply_local: add_operator
 	KUBECONFIG= kubectl apply -f kube/namespace.yml && \
+	KUBECONFIG= kubectl apply -f kube/crds/crds.yml && \
 	KUBECONFIG= kustomize build kube/overlays/local | KUBECONFIG= kubectl apply -n higiliquidos -f -
 
 apply_local_windows:

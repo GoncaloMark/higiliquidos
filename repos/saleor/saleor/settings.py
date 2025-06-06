@@ -156,13 +156,16 @@ DATABASE_CONNECTION_REPLICA_NAME = "replica"
 
 DATABASES = {
     DATABASE_CONNECTION_DEFAULT_NAME: dj_database_url.config(
-        default=PRIMARY_DB_URL, conn_max_age=60,
+        default=PRIMARY_DB_URL, conn_max_age=0,
     ),
     DATABASE_CONNECTION_REPLICA_NAME: dj_database_url.config(
         default=REPLICA_DB_URL,
-        conn_max_age=60,
+        conn_max_age=0,
     ),
 }
+
+DATABASES[DATABASE_CONNECTION_DEFAULT_NAME]['DISABLE_SERVER_SIDE_CURSORS'] = True
+DATABASES[DATABASE_CONNECTION_REPLICA_NAME]['DISABLE_SERVER_SIDE_CURSORS'] = True
 
 DATABASE_ROUTERS = ["saleor.core.db_routers.PrimaryReplicaRouter"]
 

@@ -4,13 +4,14 @@ from locust import HttpUser, task, between
 # from locust.exception import RescheduleTask
 
 class SaleorGraphQLUser(HttpUser):
-    wait_time = between(1, 3)
+    wait_time = between(1, 2)
     
     def on_start(self):
         """Initialize user session"""
         self.headers = {
             'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            # 'Connection': 'close',
         }
         self.checkout_id = None
         self.product_ids = []
