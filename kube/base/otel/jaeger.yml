@@ -5,7 +5,7 @@ metadata:
 spec:
   managementState: managed
   mode: deployment
-  image: k3d-higiliqs.local:12345/jaeger:latest
+  image: k3d-higiliqs.local:12345/jaeger:2.6.0
   config:
     service:
       extensions: [healthcheckv2, jaeger_storage, jaeger_query]

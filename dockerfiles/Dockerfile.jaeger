@@ -1,1 +1,1 @@
-FROM jaegertracing/jaeger:latest
+FROM jaegertracing/jaeger:2.6.0

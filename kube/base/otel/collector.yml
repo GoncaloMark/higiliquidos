@@ -5,6 +5,7 @@ metadata:
 spec:
   mode: deployment
   managementState: managed
+  image: k3d-higiliqs.local:12345/opentelemetry-collector:0.127.0
   config: |
     receivers:
       otlp:
