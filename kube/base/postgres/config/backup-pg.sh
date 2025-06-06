@@ -6,12 +6,12 @@ date1=$(date +%Y%m%d-%H%M)
 mkdir pg-backup
 
 echo "Waiting for PostgreSQL to be ready..."
-until pg_isready -h postgresql-postgresql.devtroncd -p 5432 -U postgres > /dev/null 2>&1; do
+until pg_isready > /dev/null 2>&1; do
     sleep 2
 done
 echo "PostgreSQL is ready."
 
-PGPASSWORD="$PG_PASS" pg_dumpall -h postgresql-postgresql.devtroncd -p 5432 -U postgres > pg-backup/postgres-db.tar
+pg_dumpall > pg-backup/postgres-db.tar
 file_name="pg-backup-$date1.tar.gz"
 
 # Compressing backup file for upload

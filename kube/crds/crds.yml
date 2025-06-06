@@ -2,7 +2,6 @@ apiVersion: opentelemetry.io/v1alpha1
 kind: Instrumentation
 metadata:
   name: saleor-instrumentation
-  namespace: higiliquidos
 spec:
   exporter:
     endpoint: http://higiliquidos-collector:4317
@@ -38,7 +37,6 @@ apiVersion: opentelemetry.io/v1alpha1
 kind: Instrumentation
 metadata:
   name: worker-instrumentation
-  namespace: higiliquidos
 spec:
   exporter:
     endpoint: http://higiliquidos-collector:4317
@@ -76,7 +74,6 @@ apiVersion: opentelemetry.io/v1alpha1
 kind: Instrumentation
 metadata:
   name: payments-instrumentation
-  namespace: higiliquidos
 spec:
   exporter:
     endpoint: http://higiliquidos-collector:4317
@@ -105,7 +102,6 @@ apiVersion: opentelemetry.io/v1alpha1
 kind: Instrumentation
 metadata:
   name: stf-instrumentation
-  namespace: higiliquidos
 spec:
   exporter:
     endpoint: http://higiliquidos-collector:4317

@@ -13,4 +13,3 @@ resources:
 - saleor-job.yml
 - saleor-ingress.yml
 - saleor-hpa.yml
-- saleor-worker-hpa.yml
