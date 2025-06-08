@@ -22,7 +22,7 @@ spec:
           'until kubectl get job saleor-setup -n higiliquidos -o jsonpath="{.status.conditions[?(@.type==\"Complete\")].status}" | grep -q True; do echo waiting for saleor-setup job; sleep 5; done;']
       containers:
       - name: saleor-worker
-        image: k3d-registry.higiliquidos.svc.cluster.local:12345/saleor
+        image: saleor
         imagePullPolicy: Always
         command:
           - celery
@@ -75,7 +75,7 @@ spec:
           'until kubectl get job saleor-setup -n higiliquidos -o jsonpath="{.status.conditions[?(@.type==\"Complete\")].status}" | grep -q True; do echo waiting for saleor-setup job; sleep 5; done;']
       containers:
       - name: saleor-beat
-        image: k3d-registry.higiliquidos.svc.cluster.local:12345/saleor
+        image: saleor
         imagePullPolicy: Always
         command:
           - celery
@@ -146,7 +146,7 @@ spec:
           'until kubectl get job saleor-setup -n higiliquidos -o jsonpath="{.status.conditions[?(@.type==\"Complete\")].status}" | grep -q True; do echo waiting for saleor-setup job; sleep 5; done;']
       containers:
       - name: saleor-flower
-        image: k3d-registry.higiliquidos.svc.cluster.local:12345/saleor
+        image: saleor
         imagePullPolicy: Always
         command:
           - celery

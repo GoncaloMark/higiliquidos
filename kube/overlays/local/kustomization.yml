@@ -3,9 +3,12 @@ kind: Kustomization
 resources:
   - ../../base
 images:
-  - name: k3d-registry.higiliquidos.svc.cluster.local:12345/saleor
+  - name: saleor
+    newName: k3d-registry.higiliquidos.svc.cluster.local:12345/saleor
     newTag: 3.20.80
-  - name: k3d-registry.higiliquidos.svc.cluster.local:12345/saleor-dashboard
+  - name: dash
+    newName: k3d-registry.higiliquidos.svc.cluster.local:12345/saleor-dashboard
     newTag: 3.20.34
-  - name: k3d-registry.higiliquidos.svc.cluster.local:12345/storefront
+  - name: storefront
+    newName: k3d-registry.higiliquidos.svc.cluster.local:12345/storefront
     newTag: 0.1.0

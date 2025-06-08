@@ -112,8 +112,8 @@ build_push_local: build_push_saleor
 
 build_push_saleor:
 	cd repos/saleor && \
-		docker build -t $(LOCAL_REGISTRY)/saleor:3.20.81 . && \
-		docker push $(LOCAL_REGISTRY)/saleor:3.20.81
+		docker build -t $(LOCAL_REGISTRY)/saleor:3.20.83 . && \
+		docker push $(LOCAL_REGISTRY)/saleor:3.20.83
 
 	cd repos/saleor-dashboard && \
 		docker build -t $(LOCAL_REGISTRY)/saleor-dashboard:3.20.34 . && \
