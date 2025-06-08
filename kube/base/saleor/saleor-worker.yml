@@ -46,6 +46,8 @@ spec:
               name: saleor-config
           - secretRef:
               name: saleor-secrets
+          - secretRef:
+              name: saleor-key
 
 ---
 
@@ -94,6 +96,8 @@ spec:
               name: saleor-config
           - secretRef:
               name: saleor-secrets
+          - secretRef:
+              name: saleor-key
 
 ---
 
@@ -165,6 +169,8 @@ spec:
               name: saleor-config
           - secretRef:
               name: saleor-secrets
+          - secretRef:
+              name: saleor-key
 ---
 
 apiVersion: v1

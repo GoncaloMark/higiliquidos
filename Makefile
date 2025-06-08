@@ -51,8 +51,35 @@ pull_all:
 		fi; \
 	done
 
+apply-secrets:
+	kubectl create secret generic cluster-secrets \
+		--from-env-file=kube/overlays/local/.env \
+		--namespace higiliquidos \
+		--dry-run=client -o yaml | kubectl apply -f -
+
+	kubectl create secret generic exporter-secrets \
+		--from-env-file=kube/overlays/local/.env.exporters \
+		--namespace higiliquidos \
+		--dry-run=client -o yaml | kubectl apply -f -
+
+	kubectl create secret generic saleor-secrets \
+		--from-env-file=kube/overlays/local/.env.saleor \
+		--namespace higiliquidos \
+		--dry-run=client -o yaml | kubectl apply -f -
+
+	kubectl create secret generic saleor-key \
+		--from-file=RSA_PRIVATE_KEY=kube/overlays/local/RSA_PRIVATE_KEY.pem \
+		--namespace higiliquidos \
+		--dry-run=client -o yaml | kubectl apply -f -
+
+	kubectl create secret generic saleor-dashboard-secrets \
+		--from-env-file=kube/overlays/local/.env.saleor-dashboard \
+		--namespace higiliquidos \
+		--dry-run=client -o yaml | kubectl apply -f -
+
 apply_local: add_operator add_argo
 	KUBECONFIG= kubectl apply -f kube/namespace.yml && \
+	make apply-secrets && \
 	KUBECONFIG= kubectl apply -n higiliquidos -f kube/crds/crds.yml && \
 	KUBECONFIG= kustomize build kube/overlays/local | KUBECONFIG= kubectl apply -n higiliquidos -f -
 
@@ -85,20 +112,20 @@ build_push_local: build_push_saleor
 
 build_push_saleor:
 	cd repos/saleor && \
-		docker build -t $(LOCAL_REGISTRY)/saleor:3.20.80 . && \
-		docker push $(LOCAL_REGISTRY)/saleor:3.20.80
+		docker build -t $(LOCAL_REGISTRY)/saleor:3.20.81 . && \
+		docker push $(LOCAL_REGISTRY)/saleor:3.20.81
 
-	cd repos/saleor-dashboard && \
-		docker build -t $(LOCAL_REGISTRY)/saleor-dashboard:3.20.34 . && \
-		docker push $(LOCAL_REGISTRY)/saleor-dashboard:3.20.34
+	# cd repos/saleor-dashboard && \
+	# 	docker build -t $(LOCAL_REGISTRY)/saleor-dashboard:3.20.34 . && \
+	# 	docker push $(LOCAL_REGISTRY)/saleor-dashboard:3.20.34
 
-	cd repos/dummy-payment-app && \
-	docker build -f Dockerfile -t $(LOCAL_REGISTRY)/dummy-payment-app:0.1.0 . && \
-	docker push $(LOCAL_REGISTRY)/dummy-payment-app:0.1.0
+	# cd repos/dummy-payment-app && \
+	# docker build -f Dockerfile -t $(LOCAL_REGISTRY)/dummy-payment-app:0.1.0 . && \
+	# docker push $(LOCAL_REGISTRY)/dummy-payment-app:0.1.0
 
-	cd scripts && \
-	docker build -t $(LOCAL_REGISTRY)/register-payments:0.1.0 . && \
-	docker push $(LOCAL_REGISTRY)/register-payments:0.1.0
+	# cd scripts && \
+	# docker build -t $(LOCAL_REGISTRY)/register-payments:0.1.0 . && \
+	# docker push $(LOCAL_REGISTRY)/register-payments:0.1.0
 
 build_storefront:
 	cd repos/storefront && \
@@ -114,6 +141,7 @@ add_operator:
 	kubectl wait --for=condition=Available --timeout=120s deployment/opentelemetry-operator-controller-manager -n opentelemetry-operator-system
 
 add_argo:
-	kubectl create namespace argocd
+	KUBECONFIG= kubectl apply -f kube/argo-ns.yml
 	kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 	kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/stable/manifests/install.yaml
+	KUBECONFIG= kustomize build kube/argo | KUBECONFIG= kubectl apply -n argocd -f -

@@ -49,3 +49,5 @@ spec:
               name: saleor-config
           - secretRef:
               name: saleor-secrets
+          - secretRef:
+              name: saleor-key
