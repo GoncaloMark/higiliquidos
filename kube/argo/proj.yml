@@ -8,6 +8,11 @@ spec:
   # Project description
   description: Our ArgoCD Project to deploy our app locally
   # Allow manifests to deploy only from Sokube git repositories
+  clusterResourceWhitelist:
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRole
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRoleBinding
   sourceRepos:
   - "https://github.com/GoncaloMark/*"
   # Only permit to deploy applications in the same cluster

@@ -5,8 +5,8 @@ metadata:
     app: higiliquidos
   name: higiliquidos-app
   annotations:
-    argocd-image-updater.argoproj.io/image-list: saleor=k3d-higiliqs.local:12345/saleor, dash=k3d-higiliqs.local:12345/saleor-dashboard, storefront=k3d-higiliqs.local:12345/storefront
-    argocd-image-updater.argoproj.io/update-strategy: latest
+    argocd-image-updater.argoproj.io/image-list: saleor=k3d-registry.higiliquidos.svc.cluster.local:12345/saleor, dash=k3d-registry.higiliquidos.svc.cluster.local:12345/saleor-dashboard, storefront=k3d-registry.higiliquidos.svc.cluster.local:12345/storefront
+    argocd-image-updater.argoproj.io/update-strategy: newest-build
     argocd-image-updater.argoproj.io/ignore-tags: latest, master
     argocd-image-updater.argoproj.io/git-branch: master
     argocd-image-updater.argoproj.io/write-back-method: git
