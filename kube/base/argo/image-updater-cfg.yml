@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-image-updater-config
+data:
+  registries.conf: |
+    registries:
+      - name: Local
+        api_url: http://k3d-registry.higiliquidos.svc.cluster.local:12345
+        insecure: yes
+        default: true

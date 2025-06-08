@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  labels:
+    app: higiliquidos
+  name: higiliquidos-app
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: saleor=k3d-higiliqs.local:12345/saleor, dash=k3d-higiliqs.local:12345/saleor-dashboard, storefront=k3d-higiliqs.local:12345/storefront
+    argocd-image-updater.argoproj.io/update-strategy: latest
+    argocd-image-updater.argoproj.io/ignore-tags: latest, master
+    argocd-image-updater.argoproj.io/git-branch: master
+    argocd-image-updater.argoproj.io/write-back-method: git
+    argocd-image-updater.argoproj.io/write-back-target: kustomization
+spec:
+  project: higiliquidos-project
+  source:
+    repoURL: https://github.com/GoncaloMark/higiliquidos.git
+    targetRevision: master
+    path: kube/overlays/local
+    directory:
+      recurse: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: higiliquidos
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true

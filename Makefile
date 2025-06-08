@@ -51,7 +51,7 @@ pull_all:
 		fi; \
 	done
 
-apply_local: add_operator
+apply_local: add_operator add_argo
 	KUBECONFIG= kubectl apply -f kube/namespace.yml && \
 	KUBECONFIG= kubectl apply -n higiliquidos -f kube/crds/crds.yml && \
 	KUBECONFIG= kustomize build kube/overlays/local | KUBECONFIG= kubectl apply -n higiliquidos -f -
@@ -112,3 +112,8 @@ add_operator:
 	kubectl wait --for=condition=Available --timeout=120s deployment/cert-manager-cainjector -n cert-manager
 	kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml
 	kubectl wait --for=condition=Available --timeout=120s deployment/opentelemetry-operator-controller-manager -n opentelemetry-operator-system
+
+add_argo:
+	kubectl create namespace argocd
+	kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+	kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/stable/manifests/install.yaml
