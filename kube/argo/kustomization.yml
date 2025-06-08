@@ -4,3 +4,4 @@ resources:
 - proj.yml
 - app.yml
 - image-updater-cfg.yml
+- hacky.yml

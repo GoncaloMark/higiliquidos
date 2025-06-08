@@ -21,7 +21,7 @@ spec:
           'until kubectl get job saleor-setup -n higiliquidos -o jsonpath="{.status.conditions[?(@.type==\"Complete\")].status}" | grep -q True; do echo waiting for saleor-setup job; sleep 5; done;']
       containers:
         - name: api
-          image: k3d-higiliqs.local:12345/saleor:3.20.80
+          image: k3d-higiliqs.local:12345/saleor
           ports:
             - containerPort: 8000
           resources:
