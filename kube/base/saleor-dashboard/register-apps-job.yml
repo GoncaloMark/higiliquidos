@@ -9,7 +9,7 @@ spec:
       restartPolicy: Never
       initContainers:
         - name: wait-for-saleor-setup
-          image: k3d-higiliqs.local:12345/curl:8.13.0 
+          image: k3d-registry.higiliquidos.svc.cluster.local:12345/curl:8.13.0 
           command:
             - sh
             - -c
@@ -19,7 +19,7 @@ spec:
                 echo "Saleor API not yet ready..."; sleep 5;
               done
         - name: wait-for-payments-api
-          image: k3d-higiliqs.local:12345/curl:8.13.0 
+          image: k3d-registry.higiliquidos.svc.cluster.local:12345/curl:8.13.0 
           command:
             - sh
             - -c
@@ -30,7 +30,7 @@ spec:
               done
       containers:
         - name: register
-          image: k3d-higiliqs.local:12345/register-payments:0.1.0
+          image: k3d-registry.higiliquidos.svc.cluster.local:12345/register-payments:0.1.0
           envFrom:
             - secretRef:
                 name: saleor-secrets

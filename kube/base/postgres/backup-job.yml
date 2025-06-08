@@ -10,7 +10,7 @@ spec:
         spec:
           containers:
           - name: postgresql-backup-job-pod
-            image: k3d-higiliqs.local:12345/bckpg:0.1.0
+            image: k3d-registry.higiliquidos.svc.cluster.local:12345/bckpg:0.1.0
             env:
               - name: PGHOST
                 valueFrom:

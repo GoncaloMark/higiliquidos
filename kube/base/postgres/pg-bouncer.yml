@@ -33,7 +33,7 @@ spec:
     spec:
       initContainers:
       - name: config-init
-        image: k3d-higiliqs.local:12345/busybox:1.37
+        image: k3d-registry.higiliquidos.svc.cluster.local:12345/busybox:1.37
         env:
         - name: PG_USER
           value: postgres
@@ -69,7 +69,7 @@ spec:
           mountPath: /etc/pgbouncer
       containers:
       - name: pgbouncer
-        image: k3d-higiliqs.local:12345/pgbouncer:v1.24.1-p0
+        image: k3d-registry.higiliquidos.svc.cluster.local:12345/pgbouncer:v1.24.1-p0
         ports:
         - containerPort: 6432
         volumeMounts:

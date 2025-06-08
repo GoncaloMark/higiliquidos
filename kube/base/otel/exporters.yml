@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: redis-exporter
-          image: k3d-higiliqs.local:12345/redis_exporter:v1.73.0
+          image: k3d-registry.higiliquidos.svc.cluster.local:12345/redis_exporter:v1.73.0
           args:
             - --redis.addr=redis://redis-service:6379
             - --redis.password=$(REDIS_PASSWORD)
@@ -106,7 +106,7 @@ spec:
     spec:
       containers:
         - name: postgres-exporter
-          image: k3d-higiliqs.local:12345/postgres-exporter:v0.17.1
+          image: k3d-registry.higiliquidos.svc.cluster.local:12345/postgres-exporter:v0.17.1
           ports:
             - containerPort: 9187
               name: http-metrics

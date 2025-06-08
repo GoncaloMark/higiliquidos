@@ -7,5 +7,6 @@ data:
     registries:
       - name: Local
         api_url: http://k3d-registry.higiliquidos.svc.cluster.local:12345
+        prefix: k3d-registry.higiliquidos.svc.cluster.local:12345
         insecure: yes
         default: true

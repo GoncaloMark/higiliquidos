@@ -16,12 +16,12 @@ spec:
     spec:
       initContainers:
       - name: wait-for-saleor-setup
-        image: k3d-higiliqs.local:12345/kubectl:1.32.3
+        image: k3d-registry.higiliquidos.svc.cluster.local:12345/kubectl:1.32.3
         command: ['sh', '-c', 
           'until kubectl get job saleor-setup -n higiliquidos -o jsonpath="{.status.conditions[?(@.type==\"Complete\")].status}" | grep -q True; do echo waiting for saleor-setup job; sleep 5; done;']
       containers:
         - name: api
-          image: k3d-higiliqs.local:12345/dummy-payment-app:0.1.0
+          image: k3d-registry.higiliquidos.svc.cluster.local:12345/dummy-payment-app:0.1.0
           imagePullPolicy: Always
           ports:
             - containerPort: 3000

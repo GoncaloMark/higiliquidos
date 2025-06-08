@@ -223,7 +223,7 @@ spec:
         app: locust-master
     spec:
       containers:
-      - image: k3d-higiliqs.local:12345/locust:2.37.6
+      - image: k3d-registry.higiliquidos.svc.cluster.local:12345/locust:2.37.6
         imagePullPolicy: Always
         name: master
         args: ["--master"]
@@ -305,7 +305,7 @@ spec:
         app: locust-worker
     spec:
       containers:
-      - image: k3d-higiliqs.local:12345/locust:2.37.6
+      - image: k3d-registry.higiliquidos.svc.cluster.local:12345/locust:2.37.6
         imagePullPolicy: Always
         name: worker
         args: ["--worker", "--master-host=locust-master"]

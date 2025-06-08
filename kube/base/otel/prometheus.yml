@@ -77,7 +77,7 @@ spec:
       serviceAccountName: prometheus
       containers:
       - name: prometheus
-        image: k3d-higiliqs.local:12345/prometheus:v3.4.0
+        image: k3d-registry.higiliquidos.svc.cluster.local:12345/prometheus:v3.4.0
         args:
           - "--config.file=/etc/prometheus/prometheus.yml"
           - "--storage.tsdb.path=/prometheus"

@@ -68,7 +68,7 @@ spec:
     spec:
       containers:
         - name: loki
-          image: k3d-higiliqs.local:12345/loki:3.5.0
+          image: k3d-registry.higiliquidos.svc.cluster.local:12345/loki:3.5.0
           args:
             - "-config.file=/etc/loki/loki-config.yaml"
             - "-config.expand-env=true"

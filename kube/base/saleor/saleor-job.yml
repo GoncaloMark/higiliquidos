@@ -9,7 +9,7 @@ spec:
       restartPolicy: Never
       initContainers:
       - name: wait-for-postgres
-        image: k3d-higiliqs.local:12345/postgres:17-alpine
+        image: k3d-registry.higiliquidos.svc.cluster.local:12345/postgres:17-alpine
         command: ['sh', '-c', 
           'until pg_isready -h postgres -d postgres; do echo waiting for postgres; sleep 10; done;']
         env:
@@ -25,7 +25,7 @@ spec:
                 key: PG_PASSWORD
                 name: cluster-secrets
       - name: wait-for-minio
-        image: k3d-higiliqs.local:12345/mc:RELEASE.2025-04-03T17-07-56Z
+        image: k3d-registry.higiliquidos.svc.cluster.local:12345/mc:RELEASE.2025-04-03T17-07-56Z
         command: ["/bin/sh", "-c"]
         args:
           - |
@@ -36,7 +36,7 @@ spec:
             done
       containers:
       - name: saleor-setup
-        image: k3d-higiliqs.local:12345/saleor
+        image: k3d-registry.higiliquidos.svc.cluster.local:12345/saleor
         imagePullPolicy: Always
         command: ["/bin/sh", "-c"]
         args:

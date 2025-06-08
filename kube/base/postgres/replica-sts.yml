@@ -26,7 +26,7 @@ spec:
       
       initContainers:
         - name: setup-replica-data-directory
-          image: k3d-higiliqs.local:12345/postgres:17-alpine
+          image: k3d-registry.higiliquidos.svc.cluster.local:12345/postgres:17-alpine
           imagePullPolicy: IfNotPresent
           
           env:
@@ -64,7 +64,7 @@ spec:
 
       containers:
         - name: postgres-replica
-          image: k3d-higiliqs.local:12345/postgres:17-alpine
+          image: k3d-registry.higiliquidos.svc.cluster.local:12345/postgres:17-alpine
           args: ['-c', 'config_file=/etc/postgres.conf']
           
           imagePullPolicy: IfNotPresent

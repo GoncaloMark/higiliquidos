@@ -7,7 +7,7 @@ SALEOR_PLATFORM_VERSION = latest
 STOREFRONT_VERSION = latest
 PAYMENT_VERSION = main
 
-LOCAL_REGISTRY = k3d-higiliqs.local:12345
+LOCAL_REGISTRY = k3d-registry.higiliquidos.svc.cluster.local:12345
 
 REPOS = \
     https://github.com/saleor/saleor.git@$(SALEOR_VERSION) \
@@ -19,8 +19,8 @@ REPOS = \
 .PHONY: cluster apply_all delete_all
 
 cluster:
-	k3d registry create higiliqs.local -p 12345
-	k3d cluster create higiliqs -p "80:80@loadbalancer" --agents 5 --registry-use k3d-higiliqs.local:12345
+	k3d registry create registry.higiliquidos.svc.cluster.local -p 12345
+	k3d cluster create higiliqs -p "80:80@loadbalancer" --agents 5 --registry-use k3d-registry.higiliquidos.svc.cluster.local:12345
 
 clone_all:
 	mkdir -p repos
@@ -115,17 +115,17 @@ build_push_saleor:
 		docker build -t $(LOCAL_REGISTRY)/saleor:3.20.81 . && \
 		docker push $(LOCAL_REGISTRY)/saleor:3.20.81
 
-	# cd repos/saleor-dashboard && \
-	# 	docker build -t $(LOCAL_REGISTRY)/saleor-dashboard:3.20.34 . && \
-	# 	docker push $(LOCAL_REGISTRY)/saleor-dashboard:3.20.34
+	cd repos/saleor-dashboard && \
+		docker build -t $(LOCAL_REGISTRY)/saleor-dashboard:3.20.34 . && \
+		docker push $(LOCAL_REGISTRY)/saleor-dashboard:3.20.34
 
-	# cd repos/dummy-payment-app && \
-	# docker build -f Dockerfile -t $(LOCAL_REGISTRY)/dummy-payment-app:0.1.0 . && \
-	# docker push $(LOCAL_REGISTRY)/dummy-payment-app:0.1.0
+	cd repos/dummy-payment-app && \
+	docker build -f Dockerfile -t $(LOCAL_REGISTRY)/dummy-payment-app:0.1.0 . && \
+	docker push $(LOCAL_REGISTRY)/dummy-payment-app:0.1.0
 
-	# cd scripts && \
-	# docker build -t $(LOCAL_REGISTRY)/register-payments:0.1.0 . && \
-	# docker push $(LOCAL_REGISTRY)/register-payments:0.1.0
+	cd scripts && \
+	docker build -t $(LOCAL_REGISTRY)/register-payments:0.1.0 . && \
+	docker push $(LOCAL_REGISTRY)/register-payments:0.1.0
 
 build_storefront:
 	cd repos/storefront && \
@@ -145,3 +145,8 @@ add_argo:
 	kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 	kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/stable/manifests/install.yaml
 	KUBECONFIG= kustomize build kube/argo | KUBECONFIG= kubectl apply -n argocd -f -
+	kubectl create secret generic higiliquidos-github-creds \
+	--namespace argocd \
+	--from-env-file=kube/overlays/local/.env.argo \
+	--dry-run=client -o yaml | kubectl label -f - argocd.argoproj.io/secret-type=repository -n argocd --local -o yaml | kubectl apply -f -
+	KUBECONFIG= kubectl -n argocd rollout restart deployment argocd-image-updater

@@ -36,7 +36,7 @@ spec:
     spec:
       containers:
       - name: grafana
-        image: k3d-higiliqs.local:12345/grafana:12.0.0
+        image: k3d-registry.higiliquidos.svc.cluster.local:12345/grafana:12.0.0
         ports:
         - containerPort: 3000
           name: http

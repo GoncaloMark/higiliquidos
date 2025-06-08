@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
       - name: create-bucket
-        image: k3d-higiliqs.local:12345/mc:RELEASE.2025-04-03T17-07-56Z
+        image: k3d-registry.higiliquidos.svc.cluster.local:12345/mc:RELEASE.2025-04-03T17-07-56Z
         command: ["/bin/sh", "-c"]
         args:
           - |

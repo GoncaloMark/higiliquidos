@@ -106,7 +106,7 @@ spec:
       serviceAccountName: promtail
       containers:
         - name: promtail
-          image: k3d-higiliqs.local:12345/promtail:2.9.0
+          image: k3d-registry.higiliquidos.svc.cluster.local:12345/promtail:2.9.0
           args:
             - -config.file=/etc/promtail/config.yml
             - -client.url=http://loki:3100/loki/api/v1/push
