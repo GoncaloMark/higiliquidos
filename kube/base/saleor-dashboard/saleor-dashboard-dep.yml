@@ -20,7 +20,7 @@ spec:
           'until kubectl get job saleor-setup -n higiliquidos -o jsonpath="{.status.conditions[?(@.type==\"Complete\")].status}" | grep -q True; do echo waiting for saleor-setup job; sleep 5; done;']
       containers:
         - name: saleor-dashboard
-          image: saleor-dashboard
+          image: saleor-dash
           imagePullPolicy: Always
           envFrom:
             - secretRef:
