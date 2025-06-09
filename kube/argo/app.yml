@@ -5,11 +5,11 @@ metadata:
     app: higiliquidos
   name: higiliquidos-app
   annotations:
-    argocd-image-updater.argoproj.io/image-list: saleor=k3d-registry.higiliquidos.svc.cluster.local:12345/saleor
+    argocd-image-updater.argoproj.io/image-list: saleor-dash=k3d-registry.higiliquidos.svc.cluster.local:12345/saleor-dashboard
     argocd-image-updater.argoproj.io/update-strategy: newest-build
     argocd-image-updater.argoproj.io/ignore-tags: latest, master
     argocd-image-updater.argoproj.io/git-branch: master
-    argocd-image-updater.argoproj.io/saleor.kustomize.image-name: saleor
+    argocd-image-updater.argoproj.io/saleor.kustomize.image-name: saleor-dash
     argocd-image-updater.argoproj.io/write-back-method: git:secret:argocd/higiliquidos-github-creds
     argocd-image-updater.argoproj.io/write-back-target: kustomization
 spec:
