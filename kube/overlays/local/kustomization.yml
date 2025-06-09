@@ -12,3 +12,5 @@ images:
   - name: storefront
     newName: k3d-registry.higiliquidos.svc.cluster.local:12345/storefront
     newTag: 0.1.0
+  - name: k3d-registry.higiliquidos.svc.cluster.local:12345/saleor-dashboard
+    newTag: 3.20.34
