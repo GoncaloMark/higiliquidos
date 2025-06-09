@@ -5,4 +5,4 @@ resources:
 images:
   - name: saleor
     newName: k3d-registry.higiliquidos.svc.cluster.local:12345/saleor
-    newTag: 3.20.85
+    newTag: 3.20.80
