@@ -77,7 +77,7 @@ apply-secrets:
 		--namespace higiliquidos \
 		--dry-run=client -o yaml | kubectl apply -f -
 
-apply_local: add_operator add_argo
+apply_local: add_operator add_argo add_drone
 	KUBECONFIG= kubectl apply -f kube/namespace.yml && \
 	make apply-secrets && \
 	KUBECONFIG= kubectl apply -n higiliquidos -f kube/crds/crds.yml && \
@@ -150,3 +150,6 @@ add_argo:
 	--from-env-file=kube/overlays/local/.env.argo \
 	--dry-run=client -o yaml | kubectl label -f - argocd.argoproj.io/secret-type=repository -n argocd --local -o yaml | kubectl apply -f -
 	KUBECONFIG= kubectl -n argocd rollout restart deployment argocd-image-updater
+
+add_drone:
+	KUBECONFIG= kustomize build kube/drone | KUBECONFIG= kubectl apply -n higiliquidos -f -
