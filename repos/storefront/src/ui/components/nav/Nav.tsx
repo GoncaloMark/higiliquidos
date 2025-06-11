@@ -8,6 +8,7 @@ import { SearchBar } from "./components/SearchBar";
 export const Nav = ({ channel }: { channel: string }) => {
 	return (
 		<nav className="flex w-full gap-4 lg:gap-6" aria-label="Main navigation">
+			HELLO!
 			<ul className="hidden gap-4 overflow-x-auto whitespace-nowrap md:flex lg:gap-8 lg:px-0">
 				<NavLinks channel={channel} />
 			</ul>
