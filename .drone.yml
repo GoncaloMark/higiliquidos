@@ -10,7 +10,8 @@ steps:
     path: /var/run
   commands:
     - sleep 5
-    - docker build -f repos/storefront/Dockerfile -t k3d-registry.higiliquidos.svc.cluster.local:12345/saleor-storefront:0.2.0 .
+    - cd repos/storefront
+    - docker build -f Dockerfile -t k3d-registry.higiliquidos.svc.cluster.local:12345/saleor-storefront:0.2.0 .
     - docker push k3d-registry.higiliquidos.svc.cluster.local:12345/saleor-storefront:0.2.0
 
 services:
@@ -21,7 +22,6 @@ services:
   - name: dockersock
     path: /var/run
   command: ["--insecure-registry", "k3d-registry.higiliquidos.svc.cluster.local:12345"]
-
 
 volumes:
 - name: dockersock 
