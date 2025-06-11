@@ -77,8 +77,9 @@ apply-secrets:
 		--namespace higiliquidos \
 		--dry-run=client -o yaml | kubectl apply -f -
 
-apply_local: add_operator add_argo add_drone
+apply_local: add_operator add_argo
 	KUBECONFIG= kubectl apply -f kube/namespace.yml && \
+	make add_drone && \
 	make apply-secrets && \
 	KUBECONFIG= kubectl apply -n higiliquidos -f kube/crds/crds.yml && \
 	KUBECONFIG= kustomize build kube/overlays/local | KUBECONFIG= kubectl apply -n higiliquidos -f -
