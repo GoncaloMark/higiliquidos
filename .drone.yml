@@ -10,8 +10,8 @@ steps:
     path: /var/run
   commands:
     - sleep 5
-    - docker build -f repos/saleor-dashboard/Dockerfile -t k3d-registry.higiliquidos.svc.cluster.local:12345/saleor-dashboard:3.20.34 .
-    - docker push k3d-registry.higiliquidos.svc.cluster.local:12345/saleor-dashboard:3.20.34
+    - docker build -f repos/storefront/Dockerfile -t k3d-registry.higiliquidos.svc.cluster.local:12345/saleor-storefront:0.2.0 .
+    - docker push k3d-registry.higiliquidos.svc.cluster.local:12345/saleor-storefront:0.2.0
 
 services:
 - name: docker
