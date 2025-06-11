@@ -11,7 +11,7 @@ steps:
   commands:
     - sleep 5
     - cd repos/storefront
-    - docker build -f Dockerfile -t k3d-registry.higiliquidos.svc.cluster.local:12345/saleor-storefront:0.2.0 .
+    - docker build --build-arg NEXT_PUBLIC_SALEOR_API_URL=http://saleor-api.higiliquidos.svc.cluster.local/graphql/ --build-arg NEXT_PUBLIC_STOREFRONT_URL=http://store.higiliquidos.deti.com/ -f Dockerfile -t k3d-registry.higiliquidos.svc.cluster.local:12345/saleor-storefront:0.2.0 .
     - docker push k3d-registry.higiliquidos.svc.cluster.local:12345/saleor-storefront:0.2.0
 
 services:
